@@ -46,8 +46,12 @@ for i in files:
                 df[word].append(i)
 
 
+
+
     documents[i]= terms
     c= ""
+
+
 
 for i in files:
     fterms = documents[i]
