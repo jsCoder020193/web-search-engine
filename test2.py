@@ -23,10 +23,18 @@ for i in files:
     words = re.sub('<[^>]*>', "  ", words)
     words = re.sub('[\s+|\\n]', " ", words)
     words = re.sub('\{[^}]*\}', " ", words)
+    #removes \\n
+    words = re.sub(r"\\n", " ", words)
+    #removes apostrophe joins word \\\' 
+    words = re.sub(r"\\\'", "", words)
+    #removes special character and keeps a-z0-9
     words = re.sub('[^\w]', " ", words)
+    #removes extra space    
     words = re.sub(' +', " ", words)
     words = re.sub('\b[an|the|and|is|for|a|its|it\'s|on]*\b', "", words)
     words = re.sub(r'\b\w{1,2}\b', '', words)
+    #remove extra spaces after removal of 2 letter words
+    words = re.sub(' +', " ", words)
     words = words.lower()
     wordlist= words.split()
     # terms = []
