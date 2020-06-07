@@ -53,29 +53,36 @@ for i in files:
                 df[word] = []
                 df[word].append(i)
 
-
-
-
     documents[i]= terms
     c= ""
-
-
 
 for i in files:
     fterms = documents[i]
     tmax = max(fterms.values())[0]
 
+    #added doc_sum
+    doc_sum = 0
     for term,value in fterms.items():
         tf = value[0]/tmax  #freq of term in doc/max freq
         idf = log2(N/(len(df[term])+1)) + 1 #Smoothed idf
         tfidf[i,term] = tf*idf
+        #doc_sum hold all tfidf for a document and squares them
+        doc_sum = doc_sum + ((tf*idf) ** 2)
+        #doc_length is the sqrt of the document sum
+        doc_length = sqrt(doc_sum)
+    #Test print
+    #print(i,":",sqrt(doc_sum))
+    #print(i,":",doc_length)        
+    
+#added his print from his example here
+print("Now the search begins:")
 
 while c != "exit":
-    c = input("Input keyword:")
+    #c = input("Input keyword:")
+    c = input("Enter a search key:")
     arr= []
     for doc in documents:
         if c in documents[doc]:
             arr.append(doc)
     print("Files containing " + c + " :")
     print(arr)
-
