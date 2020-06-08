@@ -54,7 +54,6 @@ for i in files:
                 df[word].append(i)
 
     documents[i]= terms
-    c= ""
 
 for i in files:
     fterms = documents[i]
@@ -77,12 +76,18 @@ for i in files:
 #added his print from his example here
 print("Now the search begins:")
 
-while c != "exit":
-    #c = input("Input keyword:")
-    c = input("Enter a search key:")
+c= "none"
+while c != "":
+    c = input("enter a search key=>")
     arr= []
     for doc in documents:
         if c in documents[doc]:
             arr.append(doc)
-    print("Files containing " + c + " :")
-    print(arr)
+    if len(arr)>0:
+        print("found a match:")
+        print(arr)
+    else:
+        if c!="":
+            print("no match")
+        else:
+            print("Bye")
