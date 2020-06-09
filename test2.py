@@ -16,7 +16,7 @@ positions= {}
 terms ={}
 df= {} #document frequency
 tfidf = {}
-
+doc_len= {}
 for i in files:
     file= archive.open(i,'r')
     words= str(ascii(file.read()))
@@ -68,26 +68,44 @@ for i in files:
         #doc_sum hold all tfidf for a document and squares them
         doc_sum = doc_sum + ((tf*idf) ** 2)
         #doc_length is the sqrt of the document sum
-        doc_length = sqrt(doc_sum)
+    doc_len[i] = sqrt(doc_sum)
+       
+
+
+
+def cosine(keywords):
+    cosine_sim = {}
+    str = keywords.split()
+    docs = df[str[0]]
+    for d in str:
+        docs = list(set(df[d]) & set(docs))
+    inner = Counter()
+    for x in docs:
+        for tf in str:
+            inner[x] += tfidf[x,tf]
+        cosine_sim[x]= inner[x] /(doc_len[x]*sqrt(len(str)))
+    return cosine_sim
+    
+
     #Test print
     #print(i,":",sqrt(doc_sum))
     #print(i,":",doc_length)        
     
 #added his print from his example here
-print("Now the search begins:")
-
-c= "none"
-while c != "":
-    c = input("enter a search key=>")
-    arr= []
-    for doc in documents:
-        if c in documents[doc]:
-            arr.append(doc)
-    if len(arr)>0:
-        print("found a match:")
-        print(arr)
-    else:
-        if c!="":
-            print("no match")
-        else:
-            print("Bye")
+# print("Now the search begins:")
+#
+# c= "none"
+# while c != "":
+#     c = input("enter a search key=>")
+#     arr= []
+#     for doc in documents:
+#         if c in documents[doc]:
+#             arr.append(doc)
+#     if len(arr)>0:
+#         print("found a match:")
+#         print(arr)
+#     else:
+#         if c!="":
+#             print("no match")
+#         else:
+#             print("Bye")
