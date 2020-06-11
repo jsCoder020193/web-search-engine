@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return current_app.send_static_file('search.html')
+    return current_app.send_static_file('layout.html')
 
 @app.route('/search/<searchterm>')
 def search(searchterm):

@@ -1,0 +1,244 @@
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    /* font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; */
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 0;
+    margin: 0;
+    /* background-color: #eceff1; */
+    background-color: #fafafa;
+}
+/*global*/
+.container{
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+.page_title{
+    text-align: center;
+    border-bottom: 2px solid #311b92;
+    padding: 0 0 4px;
+}
+
+.img_responsive {
+    width: 100%;
+    height: auto;
+    max-width: 600px;
+    max-height: 600px;
+}
+
+.img_center{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.italic{
+    font-style: italic;
+}
+
+/* Progress Bar*/
+#progressbar{
+    height: 10px;
+    /* background-color: #edf0f2; */
+    background-color: #cfd8dc;
+    width: 0%;
+}
+
+#progress{
+    height: 10px;
+    background-color: #6746c3;
+    width: 0%;
+}
+
+/* Showcase*/
+#showcase{
+    height: -moz-calc(100% - 107px); 
+    height: -webkit-calc(100% - 107px); 
+    height: calc(100% - 107px);
+    background-size: cover;
+    text-align: center;
+    color: #102027;
+}
+
+#showcase h1{
+    margin-top: 100px;
+    font-size: 55px;
+    margin-bottom: 10px;
+}
+
+#showcase p{
+    font-size: 20px;
+}
+
+#showcase form{
+    position: fixed;
+    top: 40%;
+    transform: translate(-50%, -40%);
+    left: 50%;
+}
+
+input[type=text]{
+    /* padding: 4px;
+    height: 36px;
+    width: 200px; */
+    font-size: 20px;
+    
+    width: 100%;
+    padding: 12px 40px;
+    margin: 8px 0 32px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+
+input[type=text]:focus{
+    border: 2px solid #6746c3;
+    outline: none;
+}
+
+.button_1{
+    height: 40px;
+    background: #311b92;
+    border: none;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: #ffffff;
+    font-size: 20px;
+    border-radius: 4px;
+}
+
+.button_1:focus{
+    color: #babdbe;
+    outline: none;
+}
+.button_1:hover{
+    color: #babdbe;
+}
+    .inputWithIcon {
+    position: relative;
+    min-width: 600px;
+  }
+  
+  .inputWithIcon i {
+    position: absolute;
+    left: 0;
+    top: 16px;
+    padding: 9px 8px;
+    color: #aaa;
+    transition: 0.3s;
+  }
+  
+  .inputWithIcon input[type="text"]:focus + i {
+    color: #6746c3;
+  }
+  
+/*projects*/
+#projects{
+    margin-top: 20px;
+    /* min-height: 100%; */
+    min-height: calc(100vh - 226px);
+}
+#projects p{
+    text-align: justify;
+}
+#projects h1{
+    font-size: 1.17em;
+}
+
+#projects ul {
+    padding: 0;
+    margin: 0;
+}
+
+#projects li {
+    list-style: none;
+    border-bottom: 2px solid #311b92;
+    /* padding-bottom: 14px;
+    padding-top: 8px; */
+}
+
+#projects li:last-of-type {
+    list-style: none;
+    border: none;
+    padding-bottom: 14px;
+    padding-top: 8px;
+}
+
+#projects img {
+    max-width: 80%;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    background: #eceff1;
+    box-shadow: 2px 0 8px black;
+}
+
+/*newsletter*/
+
+#newsletter{
+    padding: 15px;
+    border-bottom: 5px solid #311b92;
+    background-color: #6746c3;
+}
+
+#newsletter form{
+    float: left;
+    width: 100%;
+}
+
+#newsletter input[type="text"]{
+    width: 40%;
+    font-size: 18px;
+    margin: 4px 0 4px 0px;
+    padding: 10px 40px;
+    border: none;
+}
+#newsletter input[type="text"]:focus{
+    width: 40%;
+    font-size: 18px;
+    margin: 4px 0 4px 0px;
+    border: none;
+    padding: 10px 40px;
+}
+#newsletter .inputWithIcon i {
+    top: 6px;
+}
+
+#newsletter .button_1{
+    margin-left: 24px;
+    font-size: 18px;
+    background: #000063;
+}
+
+/*footer*/
+
+footer{
+    padding: 0.5px;
+    height: 53px;
+    margin-top: 53px;
+    /* color: #ffffff; */
+    background-color: #babdbe;
+    text-align: center;
+    /* border-top: 5px solid #000063; */
+}
+
+.template { display:none; }
+
+.url { font-style : italic; color : green; }
+
+#showcase{
+    display: block;
+}
+
+#newsletter{
+    display: none;
+}
+
+#projects{
+    display: none;
+}

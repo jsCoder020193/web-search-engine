@@ -3,13 +3,40 @@ function sortByRelevance(a, b) {
     else if (a["value"] == b["value"]) return 0;
     else return -1;
 };
+
+var i=0, j=0;
 $(".btn").click(() => {
 
-    var query = $("#search").val();
+    // if (j == 0) {
+    //     j = 1;
+    //     var elem = document.getElementById("progress");
+    //     var elem2 = document.getElementById("progressbar");
+    //     var width = 1;
+    //     elem2.style.width = "100%";
+    //     var id = setInterval(frame, 8);
+    //     function frame() {
+    //       if (width >= 100) {
+    //         clearInterval(id);
+    //         j = 0;
+    //       } else {
+    //         width++;
+    //         elem.style.width = width + "%";
+    //       }
+    //     }
+    //   }
+
+    var query;
+    if(i==0){
+        $("#showcase").css("display", "none");
+        $("#newsletter").css("display", "block");
+        $("#projects").css("display", "block");
+        query = $("#search").val();
+        i = 1;
+    }else{
+        query = $("#search2").val();
+    }
+    
     $("#results").empty()
-
-
-
 
     var request = $.ajax({
         url: "http://127.0.0.1:5000/search/" + query
@@ -36,9 +63,6 @@ $(".btn").click(() => {
 
         
     });
-        
-
-
 
     return false;
 });
