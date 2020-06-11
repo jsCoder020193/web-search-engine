@@ -57,6 +57,7 @@ body{
     height: -moz-calc(100% - 107px); 
     height: -webkit-calc(100% - 107px); 
     height: calc(100% - 107px);
+    min-height: calc(100vh - 107px);
     background-size: cover;
     text-align: center;
     color: #102027;
@@ -149,25 +150,6 @@ input[type=text]:focus{
     font-size: 1.17em;
 }
 
-#projects ul {
-    padding: 0;
-    margin: 0;
-}
-
-#projects li {
-    list-style: none;
-    border-bottom: 2px solid #311b92;
-    /* padding-bottom: 14px;
-    padding-top: 8px; */
-}
-
-#projects li:last-of-type {
-    list-style: none;
-    border: none;
-    padding-bottom: 14px;
-    padding-top: 8px;
-}
-
 #projects img {
     max-width: 80%;
     height: auto;
@@ -229,6 +211,8 @@ footer{
 
 .template { display:none; }
 
+.no-result-template { display:none; }
+
 .url { font-style : italic; color : green; }
 
 #showcase{
@@ -241,4 +225,12 @@ footer{
 
 #projects{
     display: none;
+}
+
+.link{
+    color: #311b92;
+}
+
+.inline h3,span{
+    display: inline;
 }

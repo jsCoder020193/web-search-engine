@@ -31,38 +31,55 @@ $(".btn").click(() => {
         $("#newsletter").css("display", "block");
         $("#projects").css("display", "block");
         query = $("#search").val();
+        $('#search2').val(query); 
         i = 1;
     }else{
         query = $("#search2").val();
     }
     
-    $("#results").empty()
+    $("#results").empty();
+    $("#no-results").empty();
 
     var request = $.ajax({
         url: "http://127.0.0.1:5000/search/" + query
     });
     request.success((results_for_ajax) => {
-        var search_results = [];
-         obj = JSON.parse(results_for_ajax);
 
-        obj.forEach(json_object => {
-            search_results.push(json_object);
-        });
-        
-        search_results.sort(sortByRelevance);
-        
-            search_results.forEach(entry => {
-                var tmp = $(".template").clone(false);
-                tmp.removeClass("template");
-                tmp.find(".link").text(entry["page"]);
-                //tmp.find(".link").text(entry.value);
-                tmp.find(".url").attr("href", entry.page);
-                tmp.find(".relevance").text(entry.value);
-                $("#results").append(tmp);
+            var search_results = [];
+            obj = JSON.parse(results_for_ajax);
+
+            obj.forEach(json_object => {
+                search_results.push(json_object);
             });
+        console.log(search_results)
+        if(search_results.length < 1){
+                var tmp = $(".no-result-template").clone(false);
+                tmp.removeClass("no-result-template");
+                tmp.find("#query-value").text(query);
+                $("#no-results").append(tmp);
+        }else{
+            search_results.sort(sortByRelevance);
+            
+                search_results.forEach(entry => {
+                    var tmp = $(".template").clone(false);
+                    tmp.removeClass("template");
+                    tmp.find(".link").text(entry["page"]);
+                    //tmp.find(".link").text(entry.value);
+                    tmp.find(".url").attr("href", entry.page);
+                    tmp.find(".relevance").text(entry.value);
+                    $("#results").append(tmp);
+                });
+        }
 
-        
-    });
+        });
 
     return false;
 });
+
+function init() {
+    // Clear forms here
+    $('#search').val("");
+    $('#search2').val("");
+}
+
+$(window).ready(init) 

@@ -76,14 +76,15 @@ for i in files:
 def cosine(keywords):
     cosine_sim = {}
     str = keywords.split()
-    docs = df[str[0]]
-    for d in str:
-        docs = list(set(df[d]) & set(docs))
-    inner = Counter()
-    for x in docs:
-        for tf in str:
-            inner[x] += tfidf[x,tf]
-        cosine_sim[x]= inner[x] /(doc_len[x]*sqrt(len(str)))
+    if str[0] in df.keys():
+        docs = df[str[0]]
+        for d in str:
+            docs = list(set(df[d]) & set(docs))
+        inner = Counter()
+        for x in docs:
+            for tf in str:
+                inner[x] += tfidf[x,tf]
+            cosine_sim[x]= inner[x] /(doc_len[x]*sqrt(len(str)))
     return cosine_sim
     
 
