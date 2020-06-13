@@ -76,10 +76,14 @@ for i in files:
 def cosine(keywords):
     cosine_sim = {}
     str = keywords.split()
-    if str[0] in df.keys():
-        docs = df[str[0]]
+    docs = []
+    if str:
+        if str[0] in df.keys():
+            docs = df[str[0]]
         for d in str:
-            docs = list(set(df[d]) & set(docs))
+            if d in df.keys():
+                docs = list(set(df[d]) & set(docs))
+            
         inner = Counter()
         for x in docs:
             for tf in str:
@@ -87,6 +91,56 @@ def cosine(keywords):
             cosine_sim[x]= inner[x] /(doc_len[x]*sqrt(len(str)))
     return cosine_sim
     
+
+# def phrasal_search(keywords):
+
+c= "none"
+while c != "":
+    c = input("enter a search key=>")
+    c = re.sub('"','', c )
+    k = c.split( )
+    and_docs = list(cosine(c).keys())
+    # for x in k:
+    #     if x in df.keys():
+    #         docs = df[x]
+    #     # f = cosine(x).keys()
+    #     # for i in f:
+    #         if len(and_docs) == 0:
+    #             and_docs.append(docs)
+    #         else:
+    #             print(list(set(and_docs) & set(docs)))
+    #             and_docs.append("1")
+
+    R = []
+
+    for doc in and_docs:
+        current_doc_terms = documents[doc]
+        # Positions of k0
+        g = current_doc_terms[k[0]]
+        # For each position p of keyword k_0 in P_0(g)
+        match_found = 1
+        for p in g[1]:
+            # For each keyword k_j, 1≤j ≤m
+            for idx, j in enumerate(k[1:]):
+                # Check whether p+|k_(j-1) |+1∈P_j
+                pj_doc = current_doc_terms[j]
+                pj = pj_doc[1]
+                # p + len(k[idx]) + 1
+                if (p + idx+ 1) not in pj:
+                    match_found = 0
+
+        if(match_found == 1):
+            R.append(doc)
+
+    if len(R)>0:
+        print("found a match:")
+        print(R)
+    else:
+        if c!="":
+            print("no match")
+        else:
+            print("Bye")
+
 
     #Test print
     #print(i,":",sqrt(doc_sum))

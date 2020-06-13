@@ -55,7 +55,7 @@ $(".btn").click(() => {
         if(search_results.length < 1){
                 var tmp = $(".no-result-template").clone(false);
                 tmp.removeClass("no-result-template");
-                tmp.find("#query-value").text(query);
+                tmp.find("#query-value").text(" "+query+" ");
                 $("#no-results").append(tmp);
         }else{
             search_results.sort(sortByRelevance);
