@@ -69,26 +69,52 @@ for i in files:
         doc_sum = doc_sum + ((tf*idf) ** 2)
         #doc_length is the sqrt of the document sum
     doc_len[i] = sqrt(doc_sum)
-       
 
-
-
-def cosine(keywords):
-    cosine_sim = {}
-    str = keywords.split()
+#Parse Query and get documents belonging to all the keywords
+def queryParser(query):
+    str = query
     docs = []
+    operator = ""
+    #Check for and or and but
+    if "and" in str:
+        operator = "and"
+        str = list(filter(("and").__ne__, str)) #revoming the word and from the list.
+    elif "or" in str:
+        operator = "or"
+        str = list(filter(("or").__ne__, str))
+    elif "but" in str:
+        operator = "but"
+        str = list(filter(("but").__ne__, str))
+    else:
+        operator = "none"
+
+    #Do Query operations and retrieve list of documents belong to the keywords.
     if str:
         if str[0] in df.keys():
             docs = df[str[0]]
         for d in str:
-            if d in df.keys():
+            if d in df.keys() and operator == "none":
                 docs = list(set(df[d]) & set(docs))
+            elif d in df.keys() and operator == "and":
+                docs = list(set(df[d]) & set(docs))
+            elif d in df.keys() and operator == "or":
+                docs = list(set(df[d]) | set(docs))
+            elif d in df.keys() and operator == "but":
+                docs = list(set(docs) - set(df[d]))
+
+    return docs
+
+
+def cosine(keywords):
+    cosine_sim = {}
+    str = keywords.lower().split()
+    docs = queryParser(str)
             
-        inner = Counter()
-        for x in docs:
-            for tf in str:
-                inner[x] += tfidf[x,tf]
-            cosine_sim[x]= inner[x] /(doc_len[x]*sqrt(len(str)))
+    inner = Counter()
+    for x in docs:
+        for tf in str:
+           inner[x] += tfidf[x,tf]
+        cosine_sim[x]= inner[x] /(doc_len[x]*sqrt(len(str)))
     return cosine_sim
     
 
