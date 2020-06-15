@@ -141,25 +141,11 @@ def cosine(keywords):
     return cosine_sim
     
 
-# def phrasal_search(keywords):
-
-c= "none"
-while c != "":
-    c = input("enter a search key=>")
-    c = re.sub('"','', c )
-    k = c.split( )
-    and_docs = list(cosine(c).keys())
-    # for x in k:
-    #     if x in df.keys():
-    #         docs = df[x]
-    #     # f = cosine(x).keys()
-    #     # for i in f:
-    #         if len(and_docs) == 0:
-    #             and_docs.append(docs)
-    #         else:
-    #             print(list(set(and_docs) & set(docs)))
-    #             and_docs.append("1")
-
+def phrasal_search(keywords):
+    keywords = re.sub('"','', keywords )
+    keywords = keywords.lower()
+    k = keywords.split( )
+    and_docs = list(cosine(keywords).keys())
     R = []
 
     for doc in and_docs:
@@ -180,15 +166,7 @@ while c != "":
 
         if(match_found == 1):
             R.append(doc)
-
-    if len(R)>0:
-        print("found a match:")
-        print(R)
-    else:
-        if c!="":
-            print("no match")
-        else:
-            print("Bye")
+    return R
 
 
     #Test print
