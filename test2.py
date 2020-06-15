@@ -120,7 +120,7 @@ def queryParser(query):
             elif d in df.keys() and operator == "or":
                 docs = list(set(df[d]).union(set(docs)))
             elif d in df.keys() and operator == "but":
-                docs = list(set(docs).difference(set(df[d]))
+                docs = list(set(docs).difference(set(df[d])))
 
     return docs
 
@@ -133,7 +133,10 @@ def cosine(keywords):
     inner = Counter()
     for x in docs:
         for tf in str:
-           inner[x] += tfidf[x,tf]
+            try:
+                inner[x] += tfidf[x,tf]
+            except:
+                pass
         cosine_sim[x]= inner[x] /(doc_len[x]*sqrt(len(str)))
     return cosine_sim
     
