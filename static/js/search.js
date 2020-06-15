@@ -63,9 +63,11 @@ $(".btn").click(() => {
                 search_results.forEach(entry => {
                     var tmp = $(".template").clone(false);
                     tmp.removeClass("template");
-                    tmp.find(".link").text(entry["page"]);
+                    tmp.find(".link").text(entry.title);
+                    tmp.find(".url").text(entry.page)
+                    tmp.find(".excerpt").text(entry.desc)
                     //tmp.find(".link").text(entry.value);
-                    tmp.find(".url").attr("href", entry.page);
+                    tmp.find(".link").attr("href", entry.page);
                     tmp.find(".relevance").text(entry.value);
                     $("#results").append(tmp);
                 });

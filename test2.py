@@ -4,6 +4,7 @@ import zipfile
 from collections import Counter, OrderedDict
 from math import log2,sqrt
 from nltk.corpus import wordnet
+from bs4 import BeautifulSoup, Comment
 
 
 archive= zipfile.ZipFile('Jan.zip','r')
@@ -19,26 +20,101 @@ terms ={}
 df= {} #document frequency
 tfidf = {}
 doc_len= {}
+title_desc = {}
 for i in files:
-    file= archive.open(i,'r')
-    words= str(ascii(file.read()))
-    words = re.sub('<[^>]*>', "  ", words)
-    words = re.sub('[\s+|\\n]', " ", words)
-    words = re.sub('\{[^}]*\}', " ", words)
-    #removes \\n
-    words = re.sub(r"\\n", " ", words)
-    #removes apostrophe joins word \\\' 
-    words = re.sub(r"\\\'", "", words)
-    #removes special character and keeps a-z0-9
-    words = re.sub('[^\w]', " ", words)
-    #removes extra space    
-    words = re.sub(' +', " ", words)
-    words = re.sub('\b[an|the|and|is|for|a|its|it\'s|on]*\b', "", words)
-    words = re.sub(r'\b\w{1,2}\b', '', words)
-    #remove extra spaces after removal of 2 letter words
-    words = re.sub(' +', " ", words)
-    words = words.lower()
-    wordlist= words.split()
+    file_contents = archive.read(i).decode('utf-8')
+    soup = BeautifulSoup(file_contents, 'html.parser')
+
+
+
+    title_desc[i]= [soup.find('title').text, ""]
+
+    for s in soup.find_all(['style', 'script']):
+        s.extract()
+    for comment in soup(text=lambda it: isinstance(it, Comment)):
+        comment.extract()
+    # pull titles and description
+    # print(soup.title.text)
+    # remove all non-alphanumeric but keep '
+    wordlist = re.sub('[^A-Za-z\']', " ", soup.text.lower()).split()
+    title_desc[i][1]=wordlist.copy()
+    stopwords = {"about", "above", "after", "again", "against", "ain", "all", "and", "any", "are", "aren", "aren't",
+                 "because", "been", "before", "being", "below", "between", "both", "but", "can", "couldn", "couldn't",
+                 "did", "didn", "didn't", "does", "doesn", "doesn't", "doing", "don", "don't", "down", "during", "each",
+                 "few", "for", "from", "further", "had", "hadn", "hadn't", "has", "hasn", "hasn't", "have", "haven",
+                 "haven't", "having", "her", "here", "hers", "herself", "him", "himself", "his", "how", "into", "isn",
+                 "isn't", "it's", "its", "itself", "just", "mightn", "mightn't", "more", "most", "mustn", "mustn't",
+                 "myself", "needn", "needn't", "nor", "not", "now", "off", "once", "only", "other", "our", "ours",
+                 "ourselves", "out", "over", "own", "same", "shan", "shan't", "she", "she's", "should", "should've",
+                 "shouldn", "shouldn't", "some", "such", "than", "that", "that'll", "the", "their", "theirs", "them",
+                 "themselves", "then", "there", "these", "they", "this", "those", "through", "too", "under", "until",
+                 "very", "was", "wasn", "wasn't", "were", "weren", "weren't", "what", "when", "where", "which", "while",
+                 "who", "whom", "why", "will", "with", "won", "won't", "wouldn", "wouldn't", "you", "you'd", "you'll",
+                 "you're", "you've", "your", "yours", "yourself", "yourselves", "could", "he'd", "he'll", "he's",
+                 "here's", "how's", "i'd", "i'll", "i'm", "i've", "let's", "ought", "she'd", "she'll", "that's",
+                 "there's", "they'd", "they'll", "they're", "they've", "we'd", "we'll", "we're", "we've", "what's",
+                 "when's", "where's", "who's", "why's", "would", "able", "abst", "accordance", "according",
+                 "accordingly", "across", "act", "actually", "added", "adj", "affected", "affecting", "affects",
+                 "afterwards", "almost", "alone", "along", "already", "also", "although", "always", "among", "amongst",
+                 "announce", "another", "anybody", "anyhow", "anymore", "anyone", "anything", "anyway", "anyways",
+                 "anywhere", "apparently", "approximately", "arent", "arise", "around", "aside", "ask", "asking",
+                 "auth", "available", "away", "awfully", "back", "became", "become", "becomes", "becoming",
+                 "beforehand", "begin", "beginning", "beginnings", "begins", "behind", "believe", "beside", "besides",
+                 "beyond", "biol", "brief", "briefly", "came", "cannot", "can't", "cause", "causes", "certain",
+                 "certainly", "com", "come", "comes", "contain", "containing", "contains", "couldnt", "date",
+                 "different", "done", "downwards", "due", "edu", "effect", "eight", "eighty", "either", "else",
+                 "elsewhere", "end", "ending", "enough", "especially", "etc", "even", "ever", "every", "everybody",
+                 "everyone", "everything", "everywhere", "except", "far", "fifth", "first", "five", "fix", "followed",
+                 "following", "follows", "former", "formerly", "forth", "found", "four", "furthermore", "gave", "get",
+                 "gets", "getting", "give", "given", "gives", "giving", "goes", "gone", "got", "gotten", "happens",
+                 "hardly", "hed", "hence", "hereafter", "hereby", "herein", "heres", "hereupon", "hes", "hid", "hither",
+                 "home", "howbeit", "however", "hundred", "immediate", "immediately", "importance", "important", "inc",
+                 "indeed", "index", "information", "instead", "invention", "inward", "itd", "it'll", "keep", "keeps",
+                 "kept", "know", "known", "knows", "largely", "last", "lately", "later", "latter", "latterly", "least",
+                 "less", "lest", "let", "lets", "like", "liked", "likely", "line", "little", "'ll", "look", "looking",
+                 "looks", "ltd", "made", "mainly", "make", "makes", "many", "may", "maybe", "mean", "means", "meantime",
+                 "meanwhile", "merely", "might", "million", "miss", "moreover", "mostly", "mrs", "much", "mug", "must",
+                 "name", "namely", "nay", "near", "nearly", "necessarily", "necessary", "need", "needs", "neither",
+                 "never", "nevertheless", "new", "next", "nine", "ninety", "nobody", "non", "none", "nonetheless",
+                 "noone", "normally", "nos", "noted", "nothing", "nowhere", "obtain", "obtained", "obviously", "often",
+                 "okay", "old", "omitted", "one", "ones", "onto", "ord", "others", "otherwise", "outside", "overall",
+                 "owing", "page", "pages", "part", "particular", "particularly", "past", "per", "perhaps", "placed",
+                 "please", "plus", "poorly", "possible", "possibly", "potentially", "predominantly", "present",
+                 "previously", "primarily", "probably", "promptly", "proud", "provides", "put", "que", "quickly",
+                 "quite", "ran", "rather", "readily", "really", "recent", "recently", "ref", "refs", "regarding",
+                 "regardless", "regards", "related", "relatively", "research", "respectively", "resulted", "resulting",
+                 "results", "right", "run", "said", "saw", "say", "saying", "says", "sec", "section", "see", "seeing",
+                 "seem", "seemed", "seeming", "seems", "seen", "self", "selves", "sent", "seven", "several", "shall",
+                 "shed", "shes", "show", "showed", "shown", "showns", "shows", "significant", "significantly",
+                 "similar", "similarly", "since", "six", "slightly", "somebody", "somehow", "someone", "somethan",
+                 "something", "sometime", "sometimes", "somewhat", "somewhere", "soon", "sorry", "specifically",
+                 "specified", "specify", "specifying", "still", "stop", "strongly", "sub", "substantially",
+                 "successfully", "sufficiently", "suggest", "sup", "sure", "take", "taken", "taking", "tell", "tends",
+                 "thank", "thanks", "thanx", "thats", "that've", "thence", "thereafter", "thereby", "thered",
+                 "therefore", "therein", "there'll", "thereof", "therere", "theres", "thereto", "thereupon", "there've",
+                 "theyd", "theyre", "think", "thou", "though", "thoughh", "thousand", "throug", "throughout", "thru",
+                 "thus", "til", "tip", "together", "took", "toward", "towards", "tried", "tries", "truly", "try",
+                 "trying", "twice", "two", "unfortunately", "unless", "unlike", "unlikely", "unto", "upon", "ups",
+                 "use", "used", "useful", "usefully", "usefulness", "uses", "using", "usually", "value", "various",
+                 "'ve", "via", "viz", "vol", "vols", "want", "wants", "wasnt", "way", "wed", "welcome", "went",
+                 "werent", "whatever", "what'll", "whats", "whence", "whenever", "whereafter", "whereas", "whereby",
+                 "wherein", "wheres", "whereupon", "wherever", "whether", "whim", "whither", "whod", "whoever", "whole",
+                 "who'll", "whomever", "whos", "whose", "widely", "willing", "wish", "within", "without", "wont",
+                 "words", "world", "wouldnt", "www", "yes", "yet", "youd", "youre", "zero", "a's", "ain't", "allow",
+                 "allows", "apart", "appear", "appreciate", "appropriate", "associated", "best", "better", "c'mon",
+                 "c's", "cant", "changes", "clearly", "concerning", "consequently", "consider", "considering",
+                 "corresponding", "course", "currently", "definitely", "described", "despite", "entirely", "exactly",
+                 "example", "going", "greetings", "hello", "help", "hopefully", "ignored", "inasmuch", "indicate",
+                 "indicated", "indicates", "inner", "insofar", "it'd", "novel", "presumably", "reasonably", "second",
+                 "secondly", "sensible", "serious", "seriously", "t's", "third", "thorough", "thoroughly", "three",
+                 "well", "wonder", "amoungst", "amount", "bill", "bottom", "call", "con", "cry", "describe", "detail",
+                 "eleven", "empty", "fifteen", "fify", "fill", "find", "fire", "forty", "front", "full", "hasnt",
+                 "interest", "mill", "mine", "move", "side", "sincere", "sixty", "system", "ten", "thickv", "thin",
+                 "top", "twelve", "twenty", "research-articl", "pagecount", "cit", "ibid", "les", "est", "pas", "los",
+                 "u201d", "well-b", "http", "volumtype", "par"}
+    # Testing purposes
+    # stopwords = {}
+    wordlist = [word for word in wordlist if len(word) > 2 and word not in stopwords]  # remove stop words and 2 chars
     # terms = []
     terms ={}
 
@@ -120,10 +196,24 @@ def queryParser(query):
             elif d in df.keys() and operator == "or":
                 docs = list(set(df[d]).union(set(docs)))
             elif d in df.keys() and operator == "but":
-                docs = list(set(docs).difference(set(df[d])))
+                if docs != df[d]:
+                    docs = list(set(docs).difference(set(df[d])))
+
+
 
     return docs
 
+def titleDesc(document,query):
+    title =title_desc[document][0]
+    for keyword in query.split():
+        try:
+            tmp = title_desc[document][1].index(keyword)
+            desc = title_desc[document][1][index: index+40]
+            break
+        except :
+            pass
+    desc= ' '.join([str(elem) for elem in desc])
+    return [title,desc]
 
 def cosine(keywords):
     cosine_sim = {}
@@ -142,53 +232,53 @@ def cosine(keywords):
     
 
 # def phrasal_search(keywords):
-
-c= "none"
-while c != "":
-    c = input("enter a search key=>")
-    c = re.sub('"','', c )
-    k = c.split( )
-    and_docs = list(cosine(c).keys())
-    # for x in k:
-    #     if x in df.keys():
-    #         docs = df[x]
-    #     # f = cosine(x).keys()
-    #     # for i in f:
-    #         if len(and_docs) == 0:
-    #             and_docs.append(docs)
-    #         else:
-    #             print(list(set(and_docs) & set(docs)))
-    #             and_docs.append("1")
-
-    R = []
-
-    for doc in and_docs:
-        current_doc_terms = documents[doc]
-        # Positions of k0
-        g = current_doc_terms[k[0]]
-        # For each position p of keyword k_0 in P_0(g)
-        match_found = 1
-        for p in g[1]:
-            # For each keyword k_j, 1≤j ≤m
-            for idx, j in enumerate(k[1:]):
-                # Check whether p+|k_(j-1) |+1∈P_j
-                pj_doc = current_doc_terms[j]
-                pj = pj_doc[1]
-                # p + len(k[idx]) + 1
-                if (p + idx+ 1) not in pj:
-                    match_found = 0
-
-        if(match_found == 1):
-            R.append(doc)
-
-    if len(R)>0:
-        print("found a match:")
-        print(R)
-    else:
-        if c!="":
-            print("no match")
-        else:
-            print("Bye")
+#
+# c= "none"
+# while c != "":
+#     c = input("enter a search key=>")
+#     c = re.sub('"','', c )
+#     k = c.split( )
+#     and_docs = list(cosine(c).keys())
+#     # for x in k:
+#     #     if x in df.keys():
+#     #         docs = df[x]
+#     #     # f = cosine(x).keys()
+#     #     # for i in f:
+#     #         if len(and_docs) == 0:
+#     #             and_docs.append(docs)
+#     #         else:
+#     #             print(list(set(and_docs) & set(docs)))
+#     #             and_docs.append("1")
+#
+#     R = []
+#
+#     for doc in and_docs:
+#         current_doc_terms = documents[doc]
+#         # Positions of k0
+#         g = current_doc_terms[k[0]]
+#         # For each position p of keyword k_0 in P_0(g)
+#         match_found = 1
+#         for p in g[1]:
+#             # For each keyword k_j, 1≤j ≤m
+#             for idx, j in enumerate(k[1:]):
+#                 # Check whether p+|k_(j-1) |+1∈P_j
+#                 pj_doc = current_doc_terms[j]
+#                 pj = pj_doc[1]
+#                 # p + len(k[idx]) + 1
+#                 if (p + idx+ 1) not in pj:
+#                     match_found = 0
+#
+#         if(match_found == 1):
+#             R.append(doc)
+#
+#     if len(R)>0:
+#         print("found a match:")
+#         print(R)
+#     else:
+#         if c!="":
+#             print("no match")
+#         else:
+#             print("Bye")
 
 
     #Test print

@@ -21,8 +21,11 @@ def search(searchterm):
     col = []
 
     for i,j in results.items():
+        titDesc=test2.titleDesc(i,searchterm)
         test = {}
         test["page"] = i
+        test["title"]= titDesc[0]
+        test["desc"]= titDesc[1]
         test["value"] = j
         col.append(test)
 
