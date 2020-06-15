@@ -162,12 +162,14 @@ def phrasal_search(keywords):
             # For each keyword k_j, 1≤j ≤m
             for idx, j in enumerate(k[1:]):
                 # Check whether p+|k_(j-1) |+1∈P_j
-                pj_doc = current_doc_terms[j]
-                pj = pj_doc[1]
-                # p + len(k[idx]) + 1
-                if (p + idx+ 1) not in pj:
+                if(j in current_doc_terms.keys()):
+                    pj_doc = current_doc_terms[j]
+                    pj = pj_doc[1]
+                    # p + len(k[idx]) + 1
+                    if (p + idx+ 1) not in pj:
+                        match_found = 0
+                else:
                     match_found = 0
-
         if(match_found == 1):
             R[doc] = 1
     return R
