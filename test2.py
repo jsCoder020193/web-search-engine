@@ -3,6 +3,8 @@ import re
 import zipfile
 from collections import Counter, OrderedDict
 from math import log2,sqrt
+from nltk.corpus import wordnet
+
 
 archive= zipfile.ZipFile('Jan.zip','r')
 
@@ -70,11 +72,21 @@ for i in files:
         #doc_length is the sqrt of the document sum
     doc_len[i] = sqrt(doc_sum)
 
+def queryExp(keyword):
+    synonyms =[]
+    for syn in wordnet.synsets(keyword):
+        for l in syn.lemmas():
+            synonyms.append(l.name())
+
+    return synonyms
+
+
 #Parse Query and get documents belonging to all the keywords
 def queryParser(query):
     str = query
     docs = []
     operator = ""
+
     #Check for and or and but
     if "and" in str:
         operator = "and"
@@ -87,6 +99,14 @@ def queryParser(query):
         str = list(filter(("but").__ne__, str))
     else:
         operator = "none"
+
+
+    #Testing Query Expansion Code.
+    #newstr=[]
+    #for q in str:
+    #    newstr.extend(queryExp(q))
+
+
 
     #Do Query operations and retrieve list of documents belong to the keywords.
     if str:
