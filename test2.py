@@ -4,7 +4,7 @@ import zipfile
 from collections import Counter, OrderedDict
 from math import log2,sqrt
 from nltk.corpus import wordnet
-
+from bs4 import BeautifulSoup, Comment
 
 archive= zipfile.ZipFile('Jan.zip','r')
 
@@ -19,6 +19,7 @@ terms ={}
 df= {} #document frequency
 tfidf = {}
 doc_len= {}
+title_desc={}
 for i in files:
     file_contents = archive.read(i).decode('utf-8')
     soup = BeautifulSoup(file_contents, 'html.parser')
