@@ -114,13 +114,13 @@ def queryParser(query):
             docs = df[str[0]]
         for d in str:
             if d in df.keys() and operator == "none":
-                docs = list(set(df[d]) & set(docs))
+                docs = list(set(df[d]).union(set(docs)))
             elif d in df.keys() and operator == "and":
                 docs = list(set(df[d]) & set(docs))
             elif d in df.keys() and operator == "or":
-                docs = list(set(df[d]) | set(docs))
+                docs = list(set(df[d]).union(set(docs)))
             elif d in df.keys() and operator == "but":
-                docs = list(set(docs) - set(df[d]))
+                docs = list(set(docs).difference(set(df[d]))
 
     return docs
 
