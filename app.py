@@ -12,7 +12,11 @@ def hello_world():
 
 @app.route('/search/<searchterm>')
 def search(searchterm):
-    results = test2.cosine(searchterm)
+    if(searchterm[0] == '"'):
+        # Phrasal Search
+        results = test2.phrasal_search(searchterm)
+    else:
+        results = test2.cosine(searchterm)
     message = {
         'status': 200,
         'message': 'OK',

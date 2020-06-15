@@ -4,7 +4,6 @@ import zipfile
 from collections import Counter, OrderedDict
 from math import log2,sqrt
 from nltk.corpus import wordnet
-from bs4 import BeautifulSoup, Comment
 
 
 archive= zipfile.ZipFile('Jan.zip','r')
@@ -20,7 +19,6 @@ terms ={}
 df= {} #document frequency
 tfidf = {}
 doc_len= {}
-title_desc = {}
 for i in files:
     file_contents = archive.read(i).decode('utf-8')
     soup = BeautifulSoup(file_contents, 'html.parser')
@@ -196,8 +194,7 @@ def queryParser(query):
             elif d in df.keys() and operator == "or":
                 docs = list(set(df[d]).union(set(docs)))
             elif d in df.keys() and operator == "but":
-                if docs != df[d]:
-                    docs = list(set(docs).difference(set(df[d])))
+                docs = list(set(docs).difference(set(df[d])))
 
 
 
@@ -231,54 +228,38 @@ def cosine(keywords):
     return cosine_sim
     
 
-# def phrasal_search(keywords):
-#
-# c= "none"
-# while c != "":
-#     c = input("enter a search key=>")
-#     c = re.sub('"','', c )
-#     k = c.split( )
-#     and_docs = list(cosine(c).keys())
-#     # for x in k:
-#     #     if x in df.keys():
-#     #         docs = df[x]
-#     #     # f = cosine(x).keys()
-#     #     # for i in f:
-#     #         if len(and_docs) == 0:
-#     #             and_docs.append(docs)
-#     #         else:
-#     #             print(list(set(and_docs) & set(docs)))
-#     #             and_docs.append("1")
-#
-#     R = []
-#
-#     for doc in and_docs:
-#         current_doc_terms = documents[doc]
-#         # Positions of k0
-#         g = current_doc_terms[k[0]]
-#         # For each position p of keyword k_0 in P_0(g)
-#         match_found = 1
-#         for p in g[1]:
-#             # For each keyword k_j, 1≤j ≤m
-#             for idx, j in enumerate(k[1:]):
-#                 # Check whether p+|k_(j-1) |+1∈P_j
-#                 pj_doc = current_doc_terms[j]
-#                 pj = pj_doc[1]
-#                 # p + len(k[idx]) + 1
-#                 if (p + idx+ 1) not in pj:
-#                     match_found = 0
-#
-#         if(match_found == 1):
-#             R.append(doc)
-#
-#     if len(R)>0:
-#         print("found a match:")
-#         print(R)
-#     else:
-#         if c!="":
-#             print("no match")
-#         else:
-#             print("Bye")
+def phrasal_search(keywords):
+    keywords = re.sub('"','', keywords)
+    k = keywords.lower().split( )
+    searchterm = ''
+    for x in k[0:-1]:
+        searchterm += x + ' and '
+    searchterm+=k[-1]
+
+    and_docs = list(cosine(searchterm).keys())
+    R = {}
+
+    for doc in and_docs:
+        current_doc_terms = documents[doc]
+        # Positions of k0
+        g = current_doc_terms[k[0]]
+        # For each position p of keyword k_0 in P_0(g)
+        match_found = 1
+        for p in g[1]:
+            # For each keyword k_j, 1≤j ≤m
+            for idx, j in enumerate(k[1:]):
+                # Check whether p+|k_(j-1) |+1∈P_j
+                if(j in current_doc_terms.keys()):
+                    pj_doc = current_doc_terms[j]
+                    pj = pj_doc[1]
+                    # p + len(k[idx]) + 1
+                    if (p + idx+ 1) not in pj:
+                        match_found = 0
+                else:
+                    match_found = 0
+        if(match_found == 1):
+            R[doc] = 1
+    return R
 
 
     #Test print
