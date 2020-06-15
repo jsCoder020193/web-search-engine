@@ -203,7 +203,9 @@ def queryParser(query):
     return docs
 
 def titleDesc(document,query):
+    query = re.sub('["]', '',query)
     title =title_desc[document][0]
+
     for keyword in query.split():
         try:
             tmp = title_desc[document][1].index(keyword)
