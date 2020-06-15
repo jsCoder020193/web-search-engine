@@ -142,11 +142,15 @@ def cosine(keywords):
     
 
 def phrasal_search(keywords):
-    keywords = re.sub('"','', keywords )
-    keywords = keywords.lower()
-    k = keywords.split( )
-    and_docs = list(cosine(keywords).keys())
-    R = []
+    keywords = re.sub('"','', keywords)
+    k = keywords.lower().split( )
+    searchterm = ''
+    for x in k[0:-1]:
+        searchterm += x + ' and '
+    searchterm+=k[-1]
+
+    and_docs = list(cosine(searchterm).keys())
+    R = {}
 
     for doc in and_docs:
         current_doc_terms = documents[doc]
@@ -165,7 +169,7 @@ def phrasal_search(keywords):
                     match_found = 0
 
         if(match_found == 1):
-            R.append(doc)
+            R[doc] = 1
     return R
 
 
