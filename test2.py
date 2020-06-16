@@ -20,11 +20,16 @@ df= {} #document frequency
 tfidf = {}
 doc_len= {}
 title_desc={}
+url= {}
+
 for i in files:
     file_contents = archive.read(i).decode('utf-8')
     soup = BeautifulSoup(file_contents, 'html.parser')
 
-
+    # list of urls of hyperlinks 
+    url[i] = []
+    for a in soup.find_all('a', href=True):
+        url[i].append(a['href'])
 
     title_desc[i]= [soup.find('title').text, ""]
 
@@ -35,7 +40,7 @@ for i in files:
     # pull titles and description
     # print(soup.title.text)
     # remove all non-alphanumeric but keep '
-    wordlist = re.sub('[^A-Za-z\']', " ", soup.text.lower()).split()
+    wordlist = re.sub('[^A-Za-z0-9\']', " ", soup.text.lower()).split()
     title_desc[i][1]=wordlist.copy()
     stopwords = {"about", "above", "after", "again", "against", "ain", "all", "and", "any", "are", "aren", "aren't",
                  "because", "been", "before", "being", "below", "between", "both", "but", "can", "couldn", "couldn't",
@@ -182,7 +187,8 @@ def queryParser(query):
     #    newstr.extend(queryExp(q))
 
 
-
+    
+    # str = [word for word in str if len(word) > 2 and word not in stopwords]
     #Do Query operations and retrieve list of documents belong to the keywords.
     if str:
         if str[0] in df.keys():
@@ -205,8 +211,8 @@ def queryParser(query):
 def titleDesc(document,query):
     query = re.sub('["]', '',query)
     title =title_desc[document][0]
-
-    for keyword in query.split():
+    desc = []
+    for keyword in query.lower().split( ):
         try:
             tmp = title_desc[document][1].index(keyword)
             desc = title_desc[document][1][index: index+40]
@@ -234,22 +240,30 @@ def cosine(keywords):
 
 def phrasal_search(keywords):
     keywords = re.sub('"','', keywords)
-    k = keywords.lower().split( )
-    searchterm = ''
-    for x in k[0:-1]:
-        searchterm += x + ' and '
-    searchterm+=k[-1]
-
-    and_docs = list(cosine(searchterm).keys())
+    keywords = re.sub('[^A-Za-z0-9\']', " ",keywords)
+    temp = keywords.lower().split( )
+    k = [word for word in temp if len(word) > 2 and word not in stopwords]
+    # searchterm = ''
+    # for x in k[0:-1]:
+    #     searchterm += x + ' and '
+    # searchterm+=k[-1]
+    and_docs = []
+    if len(k)>0:
+        if k[0] in df.keys():
+            and_docs = df[k[0]]
+        for d in k[1:]:
+            and_docs = list(set(df[d]) & set(and_docs))
+    # and_docs = list(cosine(searchterm).keys())
     R = {}
+    keywords_length = len(k)
 
     for doc in and_docs:
         current_doc_terms = documents[doc]
         # Positions of k0
         g = current_doc_terms[k[0]]
         # For each position p of keyword k_0 in P_0(g)
-        match_found = 1
         for p in g[1]:
+            count = 1
             # For each keyword k_j, 1≤j ≤m
             for idx, j in enumerate(k[1:]):
                 # Check whether p+|k_(j-1) |+1∈P_j
@@ -257,12 +271,16 @@ def phrasal_search(keywords):
                     pj_doc = current_doc_terms[j]
                     pj = pj_doc[1]
                     # p + len(k[idx]) + 1
-                    if (p + idx+ 1) not in pj:
-                        match_found = 0
+                    if (p + idx+ 1) in pj:
+                        count = count+1
                 else:
-                    match_found = 0
-        if(match_found == 1):
-            R[doc] = 1
+                    count = count-1
+            if(count == keywords_length):
+                if doc in R:
+                    R[doc] = R[doc]+1
+                else:
+                    R[doc] = 1
+                
     return R
 
 

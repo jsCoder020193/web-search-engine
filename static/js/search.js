@@ -51,7 +51,6 @@ $(".btn").click(() => {
             obj.forEach(json_object => {
                 search_results.push(json_object);
             });
-        console.log(search_results)
         if(search_results.length < 1){
                 var tmp = $(".no-result-template").clone(false);
                 tmp.removeClass("no-result-template");
