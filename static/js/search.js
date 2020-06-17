@@ -3,6 +3,28 @@ function sortByRelevance(a, b) {
     else if (a["value"] == b["value"]) return 0;
     else return -1;
 };
+function simpleTemplating(search_results) {
+
+
+                var div = []
+
+
+
+                search_results.forEach(entry => {
+                    var tmp = $(".template").clone(false);
+                    tmp.removeClass("template");
+                    tmp.find(".link").text(entry.title);
+                    tmp.find(".url").text(entry.page)
+                    tmp.find(".excerpt").text(entry.desc)
+                    //tmp.find(".link").text(entry.value);
+                    tmp.find(".link").attr("href", entry.page);
+                    tmp.find(".relevance").text(entry.value);
+                    div.push(tmp);
+
+
+                });
+                return div;
+}
 
 var i=0, j=0;
 $(".btn").click(() => {
@@ -58,18 +80,20 @@ $(".btn").click(() => {
                 $("#no-results").append(tmp);
         }else{
             search_results.sort(sortByRelevance);
-            
-                search_results.forEach(entry => {
-                    var tmp = $(".template").clone(false);
-                    tmp.removeClass("template");
-                    tmp.find(".link").text(entry.title);
-                    tmp.find(".url").text(entry.page)
-                    tmp.find(".excerpt").text(entry.desc)
-                    //tmp.find(".link").text(entry.value);
-                    tmp.find(".link").attr("href", entry.page);
-                    tmp.find(".relevance").text(entry.value);
-                    $("#results").append(tmp);
-                });
+            $('#pagination-container').pagination({
+                dataSource: search_results,
+                pageSize: 5,
+
+                className: 'paginationjs-theme-blue',
+
+                callback: function(data, pagination) {
+        $("#results").empty();
+        var html = simpleTemplating(data);
+        $("#results").append(html);
+
+    }
+})
+
         }
 
         });

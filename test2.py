@@ -5,10 +5,21 @@ from collections import Counter, OrderedDict
 from math import log2,sqrt
 from nltk.corpus import wordnet
 from bs4 import BeautifulSoup, Comment
+import ntpath
+import os
 
-archive= zipfile.ZipFile('Jan.zip','r')
+archive= zipfile.ZipFile('rhf.zip','r')
 
 files= archive.namelist()
+
+
+tmp =[]
+for str in files:
+    if(str.endswith('html') == False):
+        continue
+    else:
+        tmp.append(str)
+files = tmp
 
 N = len(files)
 
@@ -20,19 +31,49 @@ df= {} #document frequency
 tfidf = {}
 doc_len= {}
 title_desc={}
+urls= {}
+
+def buildUrls(soup):
+    for link in soup.find_all('a', href=True):
+        head, tail = ntpath.split(link['href'])
+
+
+        if tail not in urls:
+            urls["Jan/"+tail] = set()
+            urls["Jan/"+tail].add(i)
+        else:
+            urls["Jan/"+tail].add(i)
+
+
 url= {}
 
 for i in files:
-    file_contents = archive.read(i).decode('utf-8')
+
+
+    try:
+        file_contents = archive.read(i).decode('utf-8')
+    except:
+        try:
+            file_contents = archive.read(i).decode('cp1252')
+        except:
+            print("Error" + i)
+            files.remove(i)
+            continue
+
     soup = BeautifulSoup(file_contents, 'html.parser')
 
-    # list of urls of hyperlinks 
+    #grab all urls pointing to documents
+    buildUrls(soup)
+
+    # list of urls of hyperlinks
     url[i] = []
     for a in soup.find_all('a', href=True):
         url[i].append(a['href'])
-
-    title_desc[i]= [soup.find('title').text, ""]
-
+    try:
+        title_desc[i]= [soup.find('title').text, ""]
+    except:
+        files.remove(i)
+        continue
     for s in soup.find_all(['style', 'script']):
         s.extract()
     for comment in soup(text=lambda it: isinstance(it, Comment)):
@@ -138,7 +179,11 @@ for i in files:
     documents[i]= terms
 
 for i in files:
-    fterms = documents[i]
+    try:
+        fterms = documents[i]
+    except:
+        print("Error2: "+i)
+        continue
     tmax = max(fterms.values())[0]
 
     #added doc_sum
@@ -151,6 +196,8 @@ for i in files:
         doc_sum = doc_sum + ((tf*idf) ** 2)
         #doc_length is the sqrt of the document sum
     doc_len[i] = sqrt(doc_sum)
+
+
 
 def queryExp(keyword):
     synonyms =[]
@@ -187,7 +234,7 @@ def queryParser(query):
     #    newstr.extend(queryExp(q))
 
 
-    
+
     # str = [word for word in str if len(word) > 2 and word not in stopwords]
     #Do Query operations and retrieve list of documents belong to the keywords.
     if str:
@@ -219,7 +266,7 @@ def titleDesc(document,query):
             break
         except :
             pass
-    desc= ' '.join([str(elem) for elem in desc])
+    desc= ' '.join(desc)
     return [title,desc]
 
 def cosine(keywords):
@@ -280,7 +327,7 @@ def phrasal_search(keywords):
                     R[doc] = R[doc]+1
                 else:
                     R[doc] = 1
-                
+
     return R
 
 
