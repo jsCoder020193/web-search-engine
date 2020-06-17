@@ -5,6 +5,7 @@ from collections import Counter, OrderedDict
 from math import log2,sqrt
 from nltk.corpus import wordnet
 from bs4 import BeautifulSoup, Comment
+import ntpath
 
 archive= zipfile.ZipFile('Jan.zip','r')
 
@@ -20,13 +21,30 @@ df= {} #document frequency
 tfidf = {}
 doc_len= {}
 title_desc={}
+urls= {}
+
+def buildUrls(soup):
+    for link in soup.find_all('a', href=True):
+        head, tail = ntpath.split(link['href'])
+
+
+        if tail not in urls:
+            urls["Jan/"+tail] = set()
+            urls["Jan/"+tail].add(i)
+        else:
+            urls["Jan/"+tail].add(i)
+
+
 url= {}
 
 for i in files:
     file_contents = archive.read(i).decode('utf-8')
     soup = BeautifulSoup(file_contents, 'html.parser')
 
-    # list of urls of hyperlinks 
+    #grab all urls pointing to documents
+    buildUrls(soup)
+
+    # list of urls of hyperlinks
     url[i] = []
     for a in soup.find_all('a', href=True):
         url[i].append(a['href'])
@@ -152,6 +170,8 @@ for i in files:
         #doc_length is the sqrt of the document sum
     doc_len[i] = sqrt(doc_sum)
 
+
+
 def queryExp(keyword):
     synonyms =[]
     for syn in wordnet.synsets(keyword):
@@ -187,7 +207,7 @@ def queryParser(query):
     #    newstr.extend(queryExp(q))
 
 
-    
+
     # str = [word for word in str if len(word) > 2 and word not in stopwords]
     #Do Query operations and retrieve list of documents belong to the keywords.
     if str:
@@ -280,7 +300,7 @@ def phrasal_search(keywords):
                     R[doc] = R[doc]+1
                 else:
                     R[doc] = 1
-                
+
     return R
 
 
