@@ -11,9 +11,7 @@ import chardet
 
 archive= zipfile.ZipFile('rhf.zip','r')
 
-files= archive.namelist()
-
-
+# files= archive.namelist()
 # tmp =[]
 # for str in files:
 #     if(str.endswith('html') == False):
@@ -21,6 +19,9 @@ files= archive.namelist()
 #     else:
 #         tmp.append(str)
 # files = tmp
+
+if not(os.path.isdir("./static/rhf")):
+    archive.extractall('./static/')
 
 extensions = ('.htm', '.html')
 files = []
@@ -54,7 +55,6 @@ url= {}
 
 for i in files:
 
-
     # try:
     #     file_contents = archive.read(i).decode('utf-8')
     # except:
@@ -86,16 +86,10 @@ for i in files:
         url[i].append([a['href'],a.string])
 
     try:
-        title_desc[i]= [soup.find('title').text, ""]
+        title_desc[i]= [re.sub('\s+(\[rec.humor.funny\])$','',soup.find('title').text), ""]
     except:
         files.remove(i)
         continue
-    # if soup.find('title'):
-    #     title = soup.find('title').text
-    #     title = re.sub('\s+(\[rec.humor.funny\])$','',title)
-    # else:
-    #     title=""
-    # title_desc[i]= [title, ""]
 
     for s in soup.find_all(['style', 'script']):
         s.extract()
