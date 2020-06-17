@@ -32,7 +32,7 @@ for i in files:
     try:
         file_contents.decode(encoding, errors='ignore')
     except:
-        pass
+        files.remove(i)
     
     soup = BeautifulSoup(file_contents, 'html.parser')
 

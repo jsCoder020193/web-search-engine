@@ -7,19 +7,24 @@ from nltk.corpus import wordnet
 from bs4 import BeautifulSoup, Comment
 import ntpath
 import os
+import chardet
 
 archive= zipfile.ZipFile('rhf.zip','r')
 
 files= archive.namelist()
 
 
-tmp =[]
-for str in files:
-    if(str.endswith('html') == False):
-        continue
-    else:
-        tmp.append(str)
-files = tmp
+# tmp =[]
+# for str in files:
+#     if(str.endswith('html') == False):
+#         continue
+#     else:
+#         tmp.append(str)
+# files = tmp
+
+extensions = ('.htm', '.html')
+files = []
+[files.append(file) for file in archive.namelist() if file.endswith(extensions)]
 
 N = len(files)
 
@@ -50,13 +55,23 @@ url= {}
 for i in files:
 
 
+    # try:
+    #     file_contents = archive.read(i).decode('utf-8')
+    # except:
+    #     try:
+    #         file_contents = archive.read(i).decode('cp1252')
+    #     except:
+    #         print("Error" + i)
+    #         files.remove(i)
+    #         continue
+    file_contents = archive.read(i)
+    encoding = chardet.detect(file_contents)['encoding']
     try:
-        file_contents = archive.read(i).decode('utf-8')
+        file_contents.decode(encoding, errors='ignore')
     except:
         try:
-            file_contents = archive.read(i).decode('cp1252')
+            file_contents.decode()
         except:
-            print("Error" + i)
             files.remove(i)
             continue
 
@@ -67,13 +82,21 @@ for i in files:
 
     # list of urls of hyperlinks
     url[i] = []
-    for a in soup.find_all('a', href=True):
-        url[i].append(a['href'])
+    for a in soup.find_all('a', attrs={'href': re.compile("html|htm$")}):
+        url[i].append([a['href'],a.string])
+
     try:
         title_desc[i]= [soup.find('title').text, ""]
     except:
         files.remove(i)
         continue
+    # if soup.find('title'):
+    #     title = soup.find('title').text
+    #     title = re.sub('\s+(\[rec.humor.funny\])$','',title)
+    # else:
+    #     title=""
+    # title_desc[i]= [title, ""]
+
     for s in soup.find_all(['style', 'script']):
         s.extract()
     for comment in soup(text=lambda it: isinstance(it, Comment)):

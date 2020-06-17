@@ -234,3 +234,7 @@ footer{
 .inline h3,span{
     display: inline;
 }
+
+#pagination-container{
+    margin-top: 75px;
+}
