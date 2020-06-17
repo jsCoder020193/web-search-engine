@@ -6,10 +6,20 @@ from math import log2,sqrt
 from nltk.corpus import wordnet
 from bs4 import BeautifulSoup, Comment
 import ntpath
+import os
 
-archive= zipfile.ZipFile('Jan.zip','r')
+archive= zipfile.ZipFile('rhf.zip','r')
 
 files= archive.namelist()
+
+
+tmp =[]
+for str in files:
+    if(str.endswith('html') == False):
+        continue
+    else:
+        tmp.append(str)
+files = tmp
 
 N = len(files)
 
@@ -38,7 +48,18 @@ def buildUrls(soup):
 url= {}
 
 for i in files:
-    file_contents = archive.read(i).decode('utf-8')
+
+
+    try:
+        file_contents = archive.read(i).decode('utf-8')
+    except:
+        try:
+            file_contents = archive.read(i).decode('cp1252')
+        except:
+            print("Error" + i)
+            files.remove(i)
+            continue
+
     soup = BeautifulSoup(file_contents, 'html.parser')
 
     #grab all urls pointing to documents
@@ -48,9 +69,11 @@ for i in files:
     url[i] = []
     for a in soup.find_all('a', href=True):
         url[i].append(a['href'])
-
-    title_desc[i]= [soup.find('title').text, ""]
-
+    try:
+        title_desc[i]= [soup.find('title').text, ""]
+    except:
+        files.remove(i)
+        continue
     for s in soup.find_all(['style', 'script']):
         s.extract()
     for comment in soup(text=lambda it: isinstance(it, Comment)):
@@ -156,7 +179,11 @@ for i in files:
     documents[i]= terms
 
 for i in files:
-    fterms = documents[i]
+    try:
+        fterms = documents[i]
+    except:
+        print("Error2: "+i)
+        continue
     tmax = max(fterms.values())[0]
 
     #added doc_sum
@@ -239,7 +266,7 @@ def titleDesc(document,query):
             break
         except :
             pass
-    desc= ' '.join([str(elem) for elem in desc])
+    desc= ' '.join(desc)
     return [title,desc]
 
 def cosine(keywords):
