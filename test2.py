@@ -4,8 +4,10 @@ import zipfile
 from collections import Counter, OrderedDict
 from math import log2,sqrt
 from nltk.corpus import wordnet
+from nltk.tokenize import sent_tokenize
 from bs4 import BeautifulSoup, Comment
 import ntpath
+import nltk
 import os
 import chardet
 
@@ -36,11 +38,7 @@ def buildUrls(soup):
         head, tail = ntpath.split(link['href'])
 
 
-        if tail not in urls:
-            urls["Jan/"+tail] = set()
-            urls["Jan/"+tail].add(i)
-        else:
-            urls["Jan/"+tail].add(i)
+
 
 for i in files:
 
@@ -55,7 +53,18 @@ for i in files:
             files.remove(i)
             continue
 
+    
+
     soup = BeautifulSoup(file_contents, 'html.parser')
+
+    text = soup.find_all(text=True)
+    text = soup.text
+
+
+
+    test = sent_tokenize(text)
+
+
 
     #grab all urls pointing to documents
     buildUrls(soup)
