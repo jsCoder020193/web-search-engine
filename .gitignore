@@ -135,3 +135,12 @@ dmypy.json
 .idea
 idea/
 /static/rhf/
+/terms.p
+/anchorText.p
+/df.p
+/doc_len.p
+/documents.p
+/positions.p
+/tfidf.p
+/title_desc.p
+/urlsProcessed.p
