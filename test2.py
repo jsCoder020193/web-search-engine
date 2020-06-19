@@ -11,15 +11,6 @@ import chardet
 
 archive= zipfile.ZipFile('rhf.zip','r')
 
-# files= archive.namelist()
-# tmp =[]
-# for str in files:
-#     if(str.endswith('html') == False):
-#         continue
-#     else:
-#         tmp.append(str)
-# files = tmp
-
 if not(os.path.isdir("./static/rhf")):
     archive.extractall('./static/')
 
@@ -37,6 +28,7 @@ df= {} #document frequency
 tfidf = {}
 doc_len= {}
 title_desc={}
+url= {}
 urls= {}
 
 def buildUrls(soup):
@@ -50,20 +42,8 @@ def buildUrls(soup):
         else:
             urls["Jan/"+tail].add(i)
 
-
-url= {}
-
 for i in files:
 
-    # try:
-    #     file_contents = archive.read(i).decode('utf-8')
-    # except:
-    #     try:
-    #         file_contents = archive.read(i).decode('cp1252')
-    #     except:
-    #         print("Error" + i)
-    #         files.remove(i)
-    #         continue
     file_contents = archive.read(i)
     encoding = chardet.detect(file_contents)['encoding']
     try:
@@ -199,7 +179,6 @@ for i in files:
     try:
         fterms = documents[i]
     except:
-        print("Error2: "+i)
         continue
     tmax = max(fterms.values())[0]
 
@@ -252,11 +231,9 @@ def queryParser(query):
 
 
 
-    # str = [word for word in str if len(word) > 2 and word not in stopwords]
+    str = [word for word in str if len(word) > 2 and word not in stopwords]
     #Do Query operations and retrieve list of documents belong to the keywords.
     if str:
-        if str[0] in df.keys():
-            docs = df[str[0]]
         for d in str:
             if d in df.keys() and operator == "none":
                 docs = list(set(df[d]).union(set(docs)))
@@ -307,17 +284,12 @@ def phrasal_search(keywords):
     keywords = re.sub('[^A-Za-z0-9\']', " ",keywords)
     temp = keywords.lower().split( )
     k = [word for word in temp if len(word) > 2 and word not in stopwords]
-    # searchterm = ''
-    # for x in k[0:-1]:
-    #     searchterm += x + ' and '
-    # searchterm+=k[-1]
     and_docs = []
     if len(k)>0:
         if k[0] in df.keys():
             and_docs = df[k[0]]
         for d in k[1:]:
             and_docs = list(set(df[d]) & set(and_docs))
-    # and_docs = list(cosine(searchterm).keys())
     R = {}
     keywords_length = len(k)
 
@@ -345,28 +317,4 @@ def phrasal_search(keywords):
                 else:
                     R[doc] = 1
 
-    return R
-
-
-    #Test print
-    #print(i,":",sqrt(doc_sum))
-    #print(i,":",doc_length)        
-    
-#added his print from his example here
-# print("Now the search begins:")
-#
-# c= "none"
-# while c != "":
-#     c = input("enter a search key=>")
-#     arr= []
-#     for doc in documents:
-#         if c in documents[doc]:
-#             arr.append(doc)
-#     if len(arr)>0:
-#         print("found a match:")
-#         print(arr)
-#     else:
-#         if c!="":
-#             print("no match")
-#         else:
-#             print("Bye")
+    return R      
