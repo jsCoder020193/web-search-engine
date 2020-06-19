@@ -155,7 +155,10 @@ def queryParser(query):
     str = [word for word in str if len(word) > 2 and word not in stopwords]
     #Do Query operations and retrieve list of documents belong to the keywords.
     if str:
-        for d in str:
+        if str[0] in df.keys():
+            docs = df[str[0]]
+        for d in str[1:]:
+        # for d in str:
             if d in df.keys() and operator == "none":
                 docs = list(set(df[d]).union(set(docs)))
             elif d in df.keys() and operator == "and":
@@ -210,7 +213,8 @@ def phrasal_search(keywords):
         if k[0] in df.keys():
             and_docs = df[k[0]]
         for d in k[1:]:
-            and_docs = list(set(df[d]) & set(and_docs))
+            if d in df.keys():
+                and_docs = list(set(df[d]) & set(and_docs))
     R = {}
     keywords_length = len(k)
 
