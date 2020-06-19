@@ -159,15 +159,19 @@ def queryParser(query):
             docs = df[str[0]]
         for d in str[1:]:
         # for d in str:
-            if d in df.keys() and operator == "none":
-                docs = list(set(df[d]).union(set(docs)))
-            elif d in df.keys() and operator == "and":
-                docs = list(set(df[d]) & set(docs))
-            elif d in df.keys() and operator == "or":
-                docs = list(set(df[d]).union(set(docs)))
-            elif d in df.keys() and operator == "but":
-                if docs != df[d]:
-                    docs = list(set(docs).difference(set(df[d])))
+            if d in df.keys():
+                if operator == "none":
+                    docs = list(set(df[d]).union(set(docs)))
+                elif operator == "and":
+                    docs = list(set(df[d]).intersection(set(docs)))
+                elif operator == "or":
+                    docs = list(set(df[d]).union(set(docs)))
+                elif operator == "but":
+                    if docs != df[d]:
+                        docs = list(set(docs).difference(set(df[d])))
+            else:
+                if operator == "and":
+                    docs = []
 
 
 
@@ -215,6 +219,8 @@ def phrasal_search(keywords):
         for d in k[1:]:
             if d in df.keys():
                 and_docs = list(set(df[d]) & set(and_docs))
+            else:
+                and_docs = []
     R = {}
     keywords_length = len(k)
 
