@@ -10,7 +10,7 @@ import ntpath
 import nltk
 import os
 import chardet
-
+import pickle
 archive= zipfile.ZipFile('rhf.zip','r')
 
 if not(os.path.isdir("./static/rhf")):
@@ -22,74 +22,24 @@ files = []
 
 N = len(files)
 
-# terms = Counter()
-documents= {}
-positions= {}
-terms ={}
-df= {} #document frequency
-tfidf = {}
-doc_len= {}
-title_desc={}
-url= {}
-urls= {}
+urlsProcessed = pickle.load( open( "urlsProcessed.p", "rb" ) )
+anchorText= pickle.load( open( "anchorText.p", "rb" ) )
+documents= pickle.load( open( "documents.p", "rb" ) )
+positions= pickle.load( open( "positions.p", "rb" ) )
+terms =pickle.load( open( "terms.p", "rb" ) )
+df= pickle.load( open( "df.p", "rb" ) )
+tfidf = pickle.load( open( "tfidf.p", "rb" ) )
+doc_len= pickle.load( open( "doc_len.p", "rb" ) )
+title_desc=pickle.load( open( "title_desc.p", "rb" ) )
+#url= pickle.load( open( "url.p", "rb" ) )
+#urls= pickle.load( open( "urls.p", "rb" ) )
 
 def buildUrls(soup):
     for link in soup.find_all('a', href=True):
         head, tail = ntpath.split(link['href'])
 
 
-
-
-for i in files:
-
-    file_contents = archive.read(i)
-    encoding = chardet.detect(file_contents)['encoding']
-    try:
-        file_contents.decode(encoding, errors='ignore')
-    except:
-        try:
-            file_contents.decode()
-        except:
-            files.remove(i)
-            continue
-
-    
-
-    soup = BeautifulSoup(file_contents, 'html.parser')
-
-    text = soup.find_all(text=True)
-    text = soup.text
-
-
-
-    test = sent_tokenize(text)
-
-
-
-    #grab all urls pointing to documents
-    buildUrls(soup)
-
-    # list of urls of hyperlinks
-    url[i] = []
-    for a in soup.find_all('a', attrs={'href': re.compile("html|htm$")}):
-        url[i].append([a['href'],a.string])
-
-    try:
-        title_desc[i]= [re.sub('\s+(\[rec.humor.funny\])$','',soup.find('title').text), ""]
-    except:
-        files.remove(i)
-        continue
-
-    for s in soup.find_all(['style', 'script']):
-        s.extract()
-    for comment in soup(text=lambda it: isinstance(it, Comment)):
-        comment.extract()
-    # pull titles and description
-    # print(soup.title.text)
-    # remove all non-alphanumeric but keep '
-    wordlist = re.sub('[^A-Za-z0-9\']', " ", soup.text.lower()).split()
-    title_desc[i][1]=wordlist.copy()
-    stopwords = {"about", "above", "after", "again", "against", "ain", "all", "and", "any", "are", "aren", "aren't",
+stopwords = {"about", "above", "after", "again", "against", "ain", "all", "and", "any", "are", "aren", "aren't",
                  "because", "been", "before", "being", "below", "between", "both", "but", "can", "couldn", "couldn't",
                  "did", "didn", "didn't", "does", "doesn", "doesn't", "doing", "don", "don't", "down", "during", "each",
                  "few", "for", "from", "further", "had", "hadn", "hadn't", "has", "hasn", "hasn't", "have", "haven",
@@ -163,44 +113,6 @@ for i in files:
                  "interest", "mill", "mine", "move", "side", "sincere", "sixty", "system", "ten", "thickv", "thin",
                  "top", "twelve", "twenty", "research-articl", "pagecount", "cit", "ibid", "les", "est", "pas", "los",
                  "u201d", "well-b", "http", "volumtype", "par"}
-    # Testing purposes
-    # stopwords = {}
-    wordlist = [word for word in wordlist if len(word) > 2 and word not in stopwords]  # remove stop words and 2 chars
-    # terms = []
-    terms ={}
-
-    #index = position w= word
-    for index, word in enumerate(wordlist):
-        if(word in terms):
-            terms[word][0] +=1
-            terms[word][1].append(index)
-        else:
-            terms[word]= [1,[index]]
-            if word in df:
-                df[word].append(i)
-            else:
-                df[word] = []
-                df[word].append(i)
-
-    documents[i]= terms
-
-for i in files:
-    try:
-        fterms = documents[i]
-    except:
-        continue
-    tmax = max(fterms.values())[0]
-
-    #added doc_sum
-    doc_sum = 0
-    for term,value in fterms.items():
-        tf = value[0]/tmax  #freq of term in doc/max freq
-        idf = log2(N/(len(df[term])+1)) + 1 #Smoothed idf
-        tfidf[i,term] = tf*idf
-        #doc_sum hold all tfidf for a document and squares them
-        doc_sum = doc_sum + ((tf*idf) ** 2)
-        #doc_length is the sqrt of the document sum
-    doc_len[i] = sqrt(doc_sum)
 
 
 
