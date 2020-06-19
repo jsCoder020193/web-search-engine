@@ -10,8 +10,12 @@ app = Flask(__name__)
 def hello_world():
     return current_app.send_static_file('layout.html')
 
+@app.route('/search/')
 @app.route('/search/<searchterm>')
-def search(searchterm):
+def search(searchterm = None):
+    if searchterm == None:
+        tmp = '[]'
+        return jsonify(tmp)
     if(searchterm[0] == '"'):
         # Phrasal Search
         results = test2.phrasal_search(searchterm)
