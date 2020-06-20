@@ -25,6 +25,7 @@ N = len(files)
 urlsProcessed = pickle.load( open( "urlsProcessed.p", "rb" ) )
 anchorText= pickle.load( open( "anchorText.p", "rb" ) )
 documents= pickle.load( open( "documents.p", "rb" ) )
+raw_documents = pickle.load(open("raw_documents.p", "rb")) #Arturo
 positions= pickle.load( open( "positions.p", "rb" ) )
 terms =pickle.load( open( "terms.p", "rb" ) )
 df= pickle.load( open( "df.p", "rb" ) )
@@ -173,11 +174,10 @@ def queryParser(query):
                 if operator == "and":
                     docs = []
 
+    return docs, str #Arturo
 
 
-    return docs
-
-def titleDesc(document,query):
+'''def titleDesc(document,query):
     query = re.sub('["]', '',query)
     title =title_desc[document][0]
     desc = []
@@ -189,9 +189,35 @@ def titleDesc(document,query):
         except :
             pass
     desc= ' '.join(desc)
-    return [title,desc]
+    return [title,desc]'''
 
-def cosine(keywords):
+def titleDesc(document, words):
+    title = title_desc[document][0]
+    r_text = raw_documents[document]
+    desc = ""
+    for word in words:
+        matches = re.finditer(word, r_text)
+        # TODO: dont go back if already in front, i.e: index 0
+        # TODO: same for words at end
+        desc = '...'
+
+        matches = [match.start() for match in matches]  # [0, 2, 5, 9, 12 18], [1]
+        '''
+        max_matches = 4
+        if len(matches) > max_matches:
+            matches = matches[0:max_matches]  # [0, 2, 5]
+        '''
+
+        #Currently Set as 0 characters back and 20 characters forward
+        for m_position in matches:
+            prev = m_position - 0
+            next = m_position + 20
+            desc += (r_text[prev:next] + "...")
+
+    return [title, desc]
+
+
+'''def cosine(keywords):
     cosine_sim = {}
     str = keywords.lower().split()
     docs = queryParser(str)
@@ -204,10 +230,25 @@ def cosine(keywords):
             except:
                 pass
         cosine_sim[x]= inner[x] /(doc_len[x]*sqrt(len(str)))
-    return cosine_sim
+    return cosine_sim'''
+
+def cosine(keywords):
+    cosine_sim = {}
+    str = keywords.lower().split()
+    docs, words = queryParser(str)
+            
+    inner = Counter()
+    for x in docs:
+        for tf in str:
+            try:
+                inner[x] += tfidf[x,tf]
+            except:
+                pass
+        cosine_sim[x]= inner[x] /(doc_len[x]*sqrt(len(str)))
+    return cosine_sim, words
     
 
-def phrasal_search(keywords):
+'''def phrasal_search(keywords):
     keywords = re.sub('"','', keywords)
     keywords = re.sub('[^A-Za-z0-9\']', " ",keywords)
     temp = keywords.lower().split( )
@@ -216,6 +257,26 @@ def phrasal_search(keywords):
     if len(k)>0:
         if k[0] in df.keys():
             and_docs = df[k[0]]
+        for d in k[1:]:
+            if d in df.keys():
+                and_docs = list(set(df[d]) & set(and_docs))
+            else:
+                and_docs = []
+    R = {}
+    keywords_length = len(k)
+'''
+
+def phrasal_search(keywords):
+    keywords = re.sub('"', '', keywords)
+    keywords = re.sub('[^A-Za-z0-9\']', " ", keywords)
+    temp = keywords.lower().split()
+    k = [word for word in temp if len(word) > 2 and word not in stopwords]
+    and_docs = []
+    if len(k) > 0:
+        if k[0] in df.keys():
+            and_docs = df[k[0]]
+        '''for d in k[1:]:
+            and_docs = list(set(df[d]) & set(and_docs))'''
         for d in k[1:]:
             if d in df.keys():
                 and_docs = list(set(df[d]) & set(and_docs))
@@ -248,4 +309,4 @@ def phrasal_search(keywords):
                 else:
                     R[doc] = 1
 
-    return R      
+    return R, k #Arturo
