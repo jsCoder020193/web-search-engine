@@ -29,7 +29,7 @@ def search(searchterm = None):
     col = []
 
     for i,j in results.items():
-        titDesc=test2.titleDesc(i,searchterm)
+        titDesc=test2.titleDesc(i,words)
         test = {}
         test["page"] = i
         test["title"]= titDesc[0]
