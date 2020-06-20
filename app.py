@@ -12,7 +12,7 @@ def hello_world():
 
 @app.route('/search/')
 @app.route('/search/<searchterm>')
-def search(searchterm = None):
+'''def search(searchterm = None):
     if searchterm == None:
         tmp = '[]'
         return jsonify(tmp)
@@ -20,7 +20,18 @@ def search(searchterm = None):
         # Phrasal Search
         results = test2.phrasal_search(searchterm)
     else:
-        results = test2.cosine(searchterm)
+        results = test2.cosine(searchterm)'''
+
+#added code here
+def search(searchterm):
+    if(searchterm[0] == '"'):
+        # Phrasal Search
+        # results = test2.phrasal_search(searchterm)
+        results, words = test2.phrasal_search(searchterm)
+
+    else:
+        results, words = test2.cosine(searchterm)
+
     message = {
         'status': 200,
         'message': 'OK',
