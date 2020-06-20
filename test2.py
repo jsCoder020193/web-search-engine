@@ -202,11 +202,12 @@ def titleDesc(document, words):
         desc = '...'
 
         matches = [match.start() for match in matches]  # [0, 2, 5, 9, 12 18], [1]
-        '''
+        
+        #This limits the number of returns in a description to 4. Will need to rework for phrases & two words.
         max_matches = 4
         if len(matches) > max_matches:
             matches = matches[0:max_matches]  # [0, 2, 5]
-        '''
+        
 
         #Currently Set as 0 characters back and 20 characters forward
         for m_position in matches:
