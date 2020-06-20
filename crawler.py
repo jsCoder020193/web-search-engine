@@ -23,6 +23,7 @@ anchorText= {}
 
 # terms = Counter()
 documents= {}
+raw_documents = {} #Arturo
 positions= {}
 terms ={}
 df= {} #document frequency
@@ -90,6 +91,10 @@ def buildUrls(url):
         # pull titles and description
         # print(soup.title.text)
         # remove all non-alphanumeric but keep '
+        
+        # store raw text for description
+        raw_documents[i] = ' '.join(soup.text.split())
+        
         wordlist = re.sub('[^A-Za-z0-9\']', " ", soup.text.lower()).split()
         title_desc[i][1] = wordlist.copy()
         stopwords = {"about", "above", "after", "again", "against", "ain", "all", "and", "any", "are", "aren", "aren't",
@@ -247,6 +252,7 @@ for i in files:
 pickle.dump(urlsProcessed,open("urlsProcessed.p",'wb'))
 pickle.dump(anchorText,open("anchorText.p",'wb'))
 pickle.dump(documents,open("documents.p",'wb'))
+pickle.dump(raw_documents, open("raw_documents.p", 'wb'))
 pickle.dump(positions,open("positions.p",'wb'))
 pickle.dump(terms,open("terms.p",'wb'))
 pickle.dump(df,open("df.p",'wb'))
