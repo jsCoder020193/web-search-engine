@@ -191,7 +191,7 @@ def queryParser(query):
     desc= ' '.join(desc)
     return [title,desc]'''
 
-def titleDesc(document, words):
+'''def titleDesc(document, words):
     title = title_desc[document][0]
     r_text = raw_documents[document]
     desc = ""
@@ -217,8 +217,61 @@ def titleDesc(document, words):
 
     return [title, desc]
 
+'''
 
-'''def cosine(keywords):
+def titleDesc(document, words):
+    # return text text <b>word<b> text text
+    # 'dog tethered' => ['dog tethered']
+    # ['dog', 'tethered']
+    # ['dog', 'hippo']
+    title = title_desc[document][0]
+    r_text = raw_documents[document]
+    desc = ""
+    offset = 40
+    for word in words:
+        matches = re.finditer(word, r_text)
+        
+        matches = [match.start() for match in matches]  # [0, 2, 5, 9, 12 18], [1]
+
+        max_matches = 4
+        if len(matches) > max_matches:
+            matches = matches[0:max_matches]  # [0, 2, 5]
+
+        # print(m_position)
+        # print(matches)
+
+        for m_position in matches:
+            o_prev, o_next = m_position, m_position + len(word)
+            prev, next_ = o_prev, o_next
+
+            if (prev - offset) > 0:
+                # can move back
+                prev -= offset
+                prev = r_text.find(' ', prev) + 1
+            else:
+                prev = 0
+
+            if (next_ + offset) < len(r_text):
+                # can move forward
+                next_ += offset
+
+            space_ = r_text.find(' ', next_)
+            if space_ > 0:
+                next_ = space_
+            # append_desc = r_text[prev:next_]
+            append_desc = r_text[0: o_prev] + '<b style="color:blue">' + r_text[o_prev:o_next] + '</b>' + r_text[o_next:]
+            next_ += 7  # added back offset of b tags
+            append_desc = append_desc[prev:next_]
+
+            append_desc = append_desc.replace('...', '')
+
+            desc += (append_desc + "...")
+    # print(m_position) + (matches)
+    return [title, desc]
+
+
+
+def cosine(keywords):
     cosine_sim = {}
     str = keywords.lower().split()
     docs = queryParser(str)
