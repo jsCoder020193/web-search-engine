@@ -305,4 +305,4 @@ def phrasal_search(keywords):
                 else:
                     R[doc] = 1
 
-    return R, k #Arturo
+    return R, k
