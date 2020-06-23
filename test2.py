@@ -174,50 +174,8 @@ def queryParser(query):
                 if operator == "and":
                     docs = []
 
-    return docs, str #Arturo
+    return docs, str
 
-
-'''def titleDesc(document,query):
-    query = re.sub('["]', '',query)
-    title =title_desc[document][0]
-    desc = []
-    for keyword in query.lower().split( ):
-        try:
-            tmp = title_desc[document][1].index(keyword)
-            desc = title_desc[document][1][index: index+40]
-            break
-        except :
-            pass
-    desc= ' '.join(desc)
-    return [title,desc]'''
-
-'''def titleDesc(document, words):
-    title = title_desc[document][0]
-    r_text = raw_documents[document]
-    desc = ""
-    for word in words:
-        matches = re.finditer(word, r_text)
-        # TODO: dont go back if already in front, i.e: index 0
-        # TODO: same for words at end
-        desc = '...'
-
-        matches = [match.start() for match in matches]  # [0, 2, 5, 9, 12 18], [1]
-        
-        #This limits the number of returns in a description to 4. Will need to rework for phrases & two words.
-        max_matches = 4
-        if len(matches) > max_matches:
-            matches = matches[0:max_matches]  # [0, 2, 5]
-        
-
-        #Currently Set as 0 characters back and 20 characters forward
-        for m_position in matches:
-            prev = m_position - 0
-            next = m_position + 20
-            desc += (r_text[prev:next] + "...")
-
-    return [title, desc]
-
-'''
 
 def titleDesc(document, words):
     # return text text <b>word<b> text text
@@ -284,25 +242,10 @@ def cosine(keywords):
             except:
                 pass
         cosine_sim[x]= inner[x] /(doc_len[x]*sqrt(len(str)))
-    return cosine_sim'''
+    return cosine_sim
 
-def cosine(keywords):
-    cosine_sim = {}
-    str = keywords.lower().split()
-    docs, words = queryParser(str)
-            
-    inner = Counter()
-    for x in docs:
-        for tf in str:
-            try:
-                inner[x] += tfidf[x,tf]
-            except:
-                pass
-        cosine_sim[x]= inner[x] /(doc_len[x]*sqrt(len(str)))
-    return cosine_sim, words
-    
 
-'''def phrasal_search(keywords):
+def phrasal_search(keywords):
     keywords = re.sub('"','', keywords)
     keywords = re.sub('[^A-Za-z0-9\']', " ",keywords)
     temp = keywords.lower().split( )
@@ -318,7 +261,6 @@ def cosine(keywords):
                 and_docs = []
     R = {}
     keywords_length = len(k)
-'''
 
 def phrasal_search(keywords):
     keywords = re.sub('"', '', keywords)
