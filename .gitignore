@@ -144,3 +144,11 @@ idea/
 /tfidf.p
 /title_desc.p
 /urlsProcessed.p
+/raw_documents.p
+
+
+# Jan folder
+/static/Jan/
+
+# csv files
+/csv/

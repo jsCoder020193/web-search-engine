@@ -81,6 +81,9 @@ $(".btn").click(() => {
             tmp.find("#query-value").text(" " + query + " ");
             $("#no-results").append(tmp);
             $('#pagination-container').empty();
+            $("#description_col").addClass("hidden");
+            $("#results").removeClass("min_height");
+            $("#profile_col").find("h5").empty();
         } else {
             search_results.sort(sortByRelevance);
             $('#pagination-container').pagination({
@@ -94,6 +97,15 @@ $(".btn").click(() => {
                     var html = simpleTemplating(data);
                     $("#results").append(html);
 
+                    $("#results").addClass("min_height");
+
+                    $("#profile_col").find("h5").text("About " + search_results.length + " results.");
+                    var desc = $("#description_col");
+                    desc.removeClass("hidden");
+                    desc.find("h3").text(html[0].find(".link").text());
+                    desc.find("p").text(html[0].find(".excerpt").text());
+                    desc.find(".find_more").text(html[0].find(".url").text());
+                    desc.find(".find_more").attr("href", html[0].find(".url").text());
                 }
             })
 

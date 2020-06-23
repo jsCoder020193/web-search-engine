@@ -260,7 +260,8 @@ span {
 }
 
 #pagination-container {
-    margin-top: 75px;
+    margin-top: 50px;
+    float: right;
 }
 
 #logo {
@@ -269,4 +270,47 @@ span {
 
 #logo img {
     max-width: 45%;
+}
+
+
+/*css fod description box aside pane*/
+
+#projects #profile_col {
+    float: left;
+    width: 60%;
+    padding-left: 30px;
+    text-align: left;
+}
+
+#projects #profile_col img {
+    width: 180px;
+}
+
+#projects #description_col {
+    float: right;
+    width: 32%;
+    padding: 10px;
+    text-align: left;
+    border: 2px solid #050063;
+}
+
+#projects #description_col h3,
+h4 {
+    margin: 0;
+}
+
+#projects .container {
+    width: 90%;
+}
+
+.min_height {
+    min-height: 507px;
+}
+
+.hidden {
+    display: none;
+}
+
+#newsletter .container {
+    width: 90%;
 }
