@@ -1,29 +1,8 @@
-import zipfile
 import pickle
 import os
-import numpy as np
-from tabulate import tabulate
-from test2 import cosine_sim
 
-archive= zipfile.ZipFile('rhf.zip','r')
-
-if not(os.path.isdir("./static/rhf")):
-    archive.extractall('./static/')
-
-extensions = ('.htm', '.html')
-files = []
-[files.append(file) for file in archive.namelist() if file.endswith(extensions)]
-
-N = len(files)
-
-urlsProcessed = pickle.load( open( "urlsProcessed.p", "rb" ) )
-anchorText= pickle.load( open( "anchorText.p", "rb" ) )
 documents= pickle.load( open( "documents.p", "rb" ) )
-positions= pickle.load( open( "positions.p", "rb" ) )
-terms =pickle.load( open( "terms.p", "rb" ) )
-df= pickle.load( open( "df.p", "rb" ) )
 tfidf = pickle.load( open( "tfidf.p", "rb" ) )
-doc_len= pickle.load( open( "doc_len.p", "rb" ) )
 
 def WriteDictToCSV(csv_file,file_type,dict_data):
     try:
@@ -40,29 +19,37 @@ def WriteDictToCSV(csv_file,file_type,dict_data):
         print("I/O error({0}): {1}".format(errno,strerror))
     return
 
-currentPath = os.getcwd()
+def sort_dict(x):
+    return {k: v for k, v in sorted(x.items(), key=lambda item: item[1],reverse=True)}
 
-def normalized_association_matrix():
-    doc_keys = np.unique([element[0] for element in tfidf.keys()])
-    term_keys = np.unique([element[1] for element in tfidf.keys()])
+def first_five_keys(x):
+    # return {k: x[k] for k in list(x)[:5]}
+    return list(x.keys())[:5]
 
-    association_matrix = {}
+def correlation_matrix(cosine_sim, words):
+    cosine_sim = sort_dict(cosine_sim)
+    A = first_five_keys(cosine_sim)
+    k = [list(documents[x].keys()) for x in A]
+    terms = list(set(item for sublist in k for item in sublist))
 
-    # for ti in term_keys:
-    #     for tj in term_keys:
-    #         sum = 0
-    #         for d in doc_keys:
-    #             sum += tfidf[d][ti] * tfidf[d][tj] 
-    #         association_matrix[ti,tj] = sum
+    correlation_matrix = {}
+    for w in words:
+        for term in terms:
+            sum = 0
+            for doc in A:
+                prod = 0
+                if((doc,term) in tfidf.keys()) and ((doc,w) in tfidf.keys()):
+                    prod = tfidf[doc,term]*tfidf[doc,w]
+                sum +=prod
+            if not(w == term):
+                correlation_matrix[w,term] = sum
+    correlation_matrix = sort_dict(correlation_matrix)
+    correlation_matrix = first_five_keys(correlation_matrix)
+    new_words = [x[1] for x in correlation_matrix] + words
+    unique_words = set(new_words) 
+    new_query = ''
+    for x in unique_words:
+        new_query+=x+' '
+    new_query = new_query.strip()
 
-
-    WriteDictToCSV(currentPath + "/csv/tfidf_table.csv",'dict',association_matrix)
-    # WriteDictToCSV(currentPath + "/csv/tfidf_table.txt",tabulate(np.dot(tfidf.transpose(),tfidf), tablefmt='grid'))
-
-
-    # return cosine_sim
-
-# WriteDictToCSV(currentPath + "/csv/documents.csv",{key:documents[key] for key in list(documents.keys())[:250]})
-normalized_association_matrix()
-print("Done")
-print("Files Processed " + str(len(documents)))
+    return new_query

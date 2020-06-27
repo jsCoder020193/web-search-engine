@@ -20,6 +20,12 @@ function simpleTemplating(search_results) {
             //tmp.find(".link").text(entry.value);
         tmp.find(".link").attr("href", entry.page);
         tmp.find(".relevance").text(entry.value);
+        if (entry["resultType"] == "new")
+            tmp.addClass("green");
+        else if (entry["resultType"] == "original")
+            tmp.addClass("red");
+        // else
+        //     tmp.addClass("blue");
         div.push(tmp);
 
 
@@ -72,6 +78,9 @@ $(".btn").click(() => {
         var search_results = [];
         obj = JSON.parse(results_for_ajax);
 
+        // obj = JSON.parse(results_for_ajax["results"]);
+        // newKeywords = results_for_ajax["new_keywords"];
+
         obj.forEach(json_object => {
             search_results.push(json_object);
         });
@@ -100,6 +109,8 @@ $(".btn").click(() => {
                     $("#results").addClass("min_height");
 
                     $("#profile_col").find("h5").text("About " + search_results.length + " results.");
+                    // $("#profile_col").find("h5").text("About " + search_results.length + " results.   New Keywords:" + newKeywords);
+
                     var desc = $("#description_col");
                     desc.removeClass("hidden");
                     desc.find("h3").text(html[0].find(".link").text());

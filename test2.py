@@ -10,6 +10,7 @@ import nltk
 import os
 import chardet
 import pickle
+import query_expansion
 
 archive = zipfile.ZipFile('rhf.zip', 'r')
 
@@ -173,6 +174,86 @@ def queryParser(query):
     return docs, str
 
 
+def cosine(keywords):
+    cosine_sim = {}
+    str = keywords.lower().split()
+    docs, words = queryParser(str)
+
+    inner = Counter()
+    for x in docs:
+        for tf in str:
+            try:
+                inner[x] += tfidf[x, tf]
+            except:
+                pass
+        cosine_sim[x] = inner[x] / (doc_len[x] * sqrt(len(str)))
+
+    return cosine_sim, words
+
+
+def phrasal_search(keywords):
+    keywords = re.sub('"', '', keywords)
+    keywords = re.sub('[^A-Za-z0-9\']', " ", keywords)
+    temp = keywords.lower().split()
+    k = [word for word in temp if len(word) > 2 and word not in stopwords]
+    and_docs = []
+    if len(k) > 0:
+        if k[0] in df.keys():
+            and_docs = df[k[0]]
+        for d in k[1:]:
+            if d in df.keys():
+                and_docs = list(set(df[d]) & set(and_docs))
+            else:
+                and_docs = []
+    R = {}
+    keywords_length = len(k)
+
+    for doc in and_docs:
+        current_doc_terms = documents[doc]
+        # Positions of k0
+        g = current_doc_terms[k[0]]
+        # For each position p of keyword k_0 in P_0(g)
+        for p in g[1]:
+            count = 1
+            # For each keyword k_j, 1≤j ≤m
+            for idx, j in enumerate(k[1:]):
+                # Check whether p+|k_(j-1) |+1∈P_j
+                if (j in current_doc_terms.keys()):
+                    pj_doc = current_doc_terms[j]
+                    pj = pj_doc[1]
+                    # p + len(k[idx]) + 1
+                    if (p + idx + 1) in pj:
+                        count = count + 1
+                else:
+                    count = count - 1
+            if (count == keywords_length):
+                if doc in R:
+                    R[doc] = R[doc] + 1
+                else:
+                    R[doc] = 1
+
+    return R, k
+
+def search(searchterm):
+    final = {}
+    if(searchterm[0] == '"' and searchterm[-1] == '"'):
+        results, words = phrasal_search(searchterm)
+        final['original_results'] = [results,words]
+    else:
+        results, words = cosine(searchterm)
+        new_query = query_expansion.correlation_matrix(results, words)
+        results2, words2 = cosine(new_query)
+
+        # i = set(results.keys()) & set(results2.keys())
+        # results3 = {k:results2[k] for k in results2.keys() if k in i}
+        # results = {k:results[k] for k in results.keys() if k not in i}
+        results2 = {k:results2[k] for k in results2.keys() if k not in results.keys()}
+        final['original_results'] = [results,words2]
+        final['new_results'] = [results2,words2]
+        # final['intersection'] = [results3,words2]
+
+    return final
+
 def titleDesc(document, words):
     # return text text <b>word<b> text text
     # 'dog tethered' => ['dog tethered']
@@ -222,63 +303,3 @@ def titleDesc(document, words):
             desc += (append_desc + "...")
     # print(m_position) + (matches)
     return [title, desc]
-
-
-def cosine(keywords):
-    cosine_sim = {}
-    str = keywords.lower().split()
-    docs, words = queryParser(str)
-
-    inner = Counter()
-    for x in docs:
-        for tf in str:
-            try:
-                inner[x] += tfidf[x, tf]
-            except:
-                pass
-        cosine_sim[x] = inner[x] / (doc_len[x] * sqrt(len(str)))
-    return cosine_sim, words
-
-
-def phrasal_search(keywords):
-    keywords = re.sub('"', '', keywords)
-    keywords = re.sub('[^A-Za-z0-9\']', " ", keywords)
-    temp = keywords.lower().split()
-    k = [word for word in temp if len(word) > 2 and word not in stopwords]
-    and_docs = []
-    if len(k) > 0:
-        if k[0] in df.keys():
-            and_docs = df[k[0]]
-        for d in k[1:]:
-            if d in df.keys():
-                and_docs = list(set(df[d]) & set(and_docs))
-            else:
-                and_docs = []
-    R = {}
-    keywords_length = len(k)
-
-    for doc in and_docs:
-        current_doc_terms = documents[doc]
-        # Positions of k0
-        g = current_doc_terms[k[0]]
-        # For each position p of keyword k_0 in P_0(g)
-        for p in g[1]:
-            count = 1
-            # For each keyword k_j, 1≤j ≤m
-            for idx, j in enumerate(k[1:]):
-                # Check whether p+|k_(j-1) |+1∈P_j
-                if (j in current_doc_terms.keys()):
-                    pj_doc = current_doc_terms[j]
-                    pj = pj_doc[1]
-                    # p + len(k[idx]) + 1
-                    if (p + idx + 1) in pj:
-                        count = count + 1
-                else:
-                    count = count - 1
-            if (count == keywords_length):
-                if doc in R:
-                    R[doc] = R[doc] + 1
-                else:
-                    R[doc] = 1
-
-    return R, k

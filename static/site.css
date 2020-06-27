@@ -314,3 +314,15 @@ h4 {
 #newsletter .container {
     width: 90%;
 }
+
+.red h3 a {
+    color: #dd2c00;
+}
+
+.blue h3 a {
+    color: #311b92;
+}
+
+.green h3 a {
+    color: #005005;
+}
