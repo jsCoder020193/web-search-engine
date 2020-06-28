@@ -60,14 +60,17 @@ def search(searchterm):
             col.append(test)
 
 
-
     tmp = json.dumps(col)
-    # tmp1 = {
-    #     'results': tmp,
-    #     'new_keywords': new[1]
-    # }
-    # return jsonify(tmp1)
-    return jsonify(tmp)
+    if 'new_results' in search_results.keys():
+        tmp1 = {
+            'results': tmp,
+            'new_keywords': new[1]
+        }
+    else:
+        tmp1 = {
+            'results': tmp
+        }
+    return jsonify(tmp1)
 
 
 @app.route('/<path:path>')

@@ -41,8 +41,8 @@ def correlation_matrix(cosine_sim, words):
                 if((doc,term) in tfidf.keys()) and ((doc,w) in tfidf.keys()):
                     prod = tfidf[doc,term]*tfidf[doc,w]
                 sum +=prod
-            if not(w == term):
-                correlation_matrix[w,term] = sum
+            # if not(w == term): #Ignoring original keywords as they will have max correlation by default
+            correlation_matrix[w,term] = sum
     correlation_matrix = sort_dict(correlation_matrix)
     correlation_matrix = first_five_keys(correlation_matrix)
     new_words = [x[1] for x in correlation_matrix] + words

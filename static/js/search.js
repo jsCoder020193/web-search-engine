@@ -76,10 +76,11 @@ $(".btn").click(() => {
     request.success((results_for_ajax) => {
 
         var search_results = [];
-        obj = JSON.parse(results_for_ajax);
+        // obj = JSON.parse(results_for_ajax);
 
-        // obj = JSON.parse(results_for_ajax["results"]);
-        // newKeywords = results_for_ajax["new_keywords"];
+        obj = JSON.parse(results_for_ajax["results"]);
+        if (results_for_ajax["new_keywords"])
+            newKeywords = results_for_ajax["new_keywords"];
 
         obj.forEach(json_object => {
             search_results.push(json_object);
@@ -109,8 +110,10 @@ $(".btn").click(() => {
                     $("#results").addClass("min_height");
 
                     $("#profile_col").find("h5").text("About " + search_results.length + " results. ");
-                    // $("#profile_col").find("h5").text("About " + search_results.length + " results.   New Keywords:" + newKeywords);
-                    $("#profile_col").find("h5").append("Color Key: <span class='color-box' style='background-color: #311b92;'></span> for original results and <span class='color-box' style='background-color: #dd2c00;'></span> for reformulated query results.");
+                    if (results_for_ajax["new_keywords"]) {
+                        $("#profile_col").find("h5").append("Color Key: <span class='color-box' style='background-color: #311b92;'></span> for original results and <span class='color-box' style='background-color: #dd2c00;'></span> for reformulated query results.");
+                        $("#profile_col").find("h5").append("<br>New Keywords: " + newKeywords);
+                    }
 
                     var desc = $("#description_col");
                     desc.removeClass("hidden");
