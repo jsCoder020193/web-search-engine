@@ -21,11 +21,11 @@ function simpleTemplating(search_results) {
         tmp.find(".link").attr("href", entry.page);
         tmp.find(".relevance").text(entry.value);
         if (entry["resultType"] == "new")
-            tmp.addClass("green");
-        else if (entry["resultType"] == "original")
             tmp.addClass("red");
-        // else
-        //     tmp.addClass("blue");
+        else if (entry["resultType"] == "original")
+            tmp.addClass("blue");
+        else
+            tmp.addClass("green");
         div.push(tmp);
 
 
@@ -108,8 +108,9 @@ $(".btn").click(() => {
 
                     $("#results").addClass("min_height");
 
-                    $("#profile_col").find("h5").text("About " + search_results.length + " results.");
+                    $("#profile_col").find("h5").text("About " + search_results.length + " results. ");
                     // $("#profile_col").find("h5").text("About " + search_results.length + " results.   New Keywords:" + newKeywords);
+                    $("#profile_col").find("h5").append("Color Key: <span class='color-box' style='background-color: #311b92;'></span> for original results and <span class='color-box' style='background-color: #dd2c00;'></span> for reformulated query results.");
 
                     var desc = $("#description_col");
                     desc.removeClass("hidden");

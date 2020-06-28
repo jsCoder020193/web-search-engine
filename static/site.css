@@ -326,3 +326,9 @@ h4 {
 .green h3 a {
     color: #005005;
 }
+
+.color-box {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+}

@@ -241,17 +241,17 @@ def search(searchterm):
         final['original_results'] = [results,words]
     else:
         results, words = cosine(searchterm)
-        new_query = query_expansion.correlation_matrix(results, words)
-        results2, words2 = cosine(new_query)
-
-        # i = set(results.keys()) & set(results2.keys())
-        # results3 = {k:results2[k] for k in results2.keys() if k in i}
-        # results = {k:results[k] for k in results.keys() if k not in i}
-        results2 = {k:results2[k] for k in results2.keys() if k not in results.keys()}
-        final['original_results'] = [results,words2]
-        final['new_results'] = [results2,words2]
-        # final['intersection'] = [results3,words2]
-
+        if len(results.keys())>0:
+            new_query = query_expansion.correlation_matrix(results, words)
+            results2, words2 = cosine(new_query)
+            # Take intersection of two sets and remove common elements
+            # i = set(results.keys()) & set(results2.keys())
+            # results3 = {k:results2[k] for k in results2.keys() if k in i}
+            # results = {k:results[k] for k in results.keys() if k not in i}
+            # final['intersection'] = [results3,words2]
+            results2 = {k:results2[k] for k in results2.keys() if k not in results.keys()}
+            final['new_results'] = [results2,words2]
+        final['original_results'] = [results, words2 if 'words2' in locals() else words]
     return final
 
 def titleDesc(document, words):
