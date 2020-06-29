@@ -96,6 +96,14 @@ $(".btn").click(() => {
             $("#profile_col").find("h5").empty();
         } else {
             search_results.sort(sortByRelevance);
+            var testHTML = simpleTemplating(search_results);
+            var desc = $("#description_col");
+            desc.removeClass("hidden");
+            desc.find("h3").text(testHTML[0].find(".link").text());
+            desc.find("p").text(testHTML[0].find(".excerpt").text());
+            desc.find(".find_more").text(testHTML[0].find(".url").text());
+            desc.find(".find_more").attr("href", testHTML[0].find(".url").text());
+
             $('#pagination-container').pagination({
                 dataSource: search_results,
                 pageSize: 5,
@@ -103,6 +111,7 @@ $(".btn").click(() => {
                 className: 'paginationjs-theme-blue',
 
                 callback: function(data, pagination) {
+                    console.log(pagination);
                     $("#results").empty();
                     var html = simpleTemplating(data);
                     $("#results").append(html);
@@ -115,12 +124,6 @@ $(".btn").click(() => {
                         $("#profile_col").find("h5").append("<br>New Keywords: " + newKeywords);
                     }
 
-                    var desc = $("#description_col");
-                    desc.removeClass("hidden");
-                    desc.find("h3").text(html[0].find(".link").text());
-                    desc.find("p").text(html[0].find(".excerpt").text());
-                    desc.find(".find_more").text(html[0].find(".url").text());
-                    desc.find(".find_more").attr("href", html[0].find(".url").text());
                 }
             })
 
