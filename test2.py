@@ -302,4 +302,11 @@ def titleDesc(document, words):
 
             desc += (append_desc + "...")
     # print(m_position) + (matches)
+    if len(desc.strip()) == 0:
+        if len(r_text) > 100:
+            last_ = r_text.find(' ', 80)
+        else:
+            last_ = len(r_text)
+        desc = r_text[0: last_]
+        
     return [title, desc]
