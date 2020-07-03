@@ -95,6 +95,7 @@ $(".btn").click(() => {
             $("#results").removeClass("min_height");
             $("#profile_col").find("h5").empty();
         } else {
+            var start = new Date().getTime();
             search_results.sort(sortByRelevance);
             var testHTML = simpleTemplating(search_results);
             var desc = $("#description_col");
@@ -118,7 +119,10 @@ $(".btn").click(() => {
 
                     $("#results").addClass("min_height");
 
-                    $("#profile_col").find("h5").text("About " + search_results.length + " results. ");
+                    var time_elapsed = (new Date().getTime()) - start;
+
+                    $("#profile_col").find("h5").text("About " + search_results.length + " results (" + (time_elapsed / 1000)+ ' seconds)');
+                    $("#profile_col").find('h5').append('<br/>');
                     if (results_for_ajax["new_keywords"]) {
                         $("#profile_col").find("h5").append("Color Key: <span class='color-box' style='background-color: #311b92;'></span> for original results and <span class='color-box' style='background-color: #dd2c00;'></span> for reformulated query results.");
                         $("#profile_col").find("h5").append("<br>New Keywords: " + newKeywords);
